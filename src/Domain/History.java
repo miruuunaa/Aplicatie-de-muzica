@@ -1,8 +1,6 @@
 package Domain;
-
 import java.util.ArrayList;
 import java.util.List;
-
 public class History {
     private Listener user;
     private List<Song> songs;
@@ -22,10 +20,6 @@ public class History {
 
     public void add_song_to_history(Song song) {
         songs.add(song);
-        System.out.println("Song " + song.getTitle() + " has been added to the history of user: " + user.getName());
     }
 
-    public List<Song> getSongs() {
-        return new ArrayList<>(songs);
-    }
 }

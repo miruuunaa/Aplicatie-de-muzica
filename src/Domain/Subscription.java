@@ -36,18 +36,8 @@ public class Subscription {
     }
 
     public void upgrade() {
-        if (type.equals("Basic")) {
-            type = "Premium";
-            price = 99.99f;
-            System.out.println("Subscription upgraded to Premium for user: " + user.getName());
-        } else {
-            System.out.println("User " + user.getName() + " already has the highest subscription type.");
-        }
     }
 
     public void cancel() {
-        System.out.println("Subscription for user " + user.getName() + " has been canceled.");
-        type = "None";
-        price = 0.0f;
     }
 }
