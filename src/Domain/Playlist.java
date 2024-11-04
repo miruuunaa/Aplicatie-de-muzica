@@ -1,9 +1,9 @@
 package Domain;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
-public class Playlist {
+public class Playlist implements Playable {
     private String name;
     private Listener user;
     private List<Song> songs;
@@ -31,40 +31,41 @@ public class Playlist {
     }
 
     public List<Song> getSongs() {
-        return songs;
+        return new ArrayList<>(songs);
     }
 
-    public void add_song(Song song) {
+    public void setSongs(List<Song> songs) {
+        this.songs = new ArrayList<>(songs);
+    }
+
+    public void addSong(Song song) {
         songs.add(song);
-        System.out.println("Song " + song.getTitle() + " has been added to playlist " + name + ".");
+        System.out.println("Added song: " + song.getTitle() + " to playlist: " + name);
     }
 
-    public void remove_song(Song song) {
+    public void removeSong(Song song) {
         if (songs.remove(song)) {
-            System.out.println("Song " + song.getTitle() + " has been removed from playlist " + name + ".");
+            System.out.println("Removed song: " + song.getTitle() + " from playlist: " + name);
         } else {
-            System.out.println("Song " + song.getTitle() + " not found in playlist " + name + ".");
+            System.out.println("Song: " + song.getTitle() + " not found in playlist: " + name);
         }
     }
 
+    @Override
     public void play() {
         System.out.println("Playing playlist: " + name);
         for (Song song : songs) {
-            song.play();
+            song.play(); // Redăm fiecare melodie din playlist
         }
     }
 
+    @Override
     public void pause() {
         System.out.println("Pausing playlist: " + name);
-        for (Song song : songs) {
-            song.pause();
-        }
     }
 
+    @Override
     public void stop() {
         System.out.println("Stopping playlist: " + name);
-        for (Song song : songs) {
-            song.stop();
-        }
     }
 }

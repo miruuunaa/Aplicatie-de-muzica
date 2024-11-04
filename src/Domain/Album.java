@@ -11,11 +11,11 @@ public class Album {
     private Artist artist;
     private List<Song> songs;
 
-    public Album(String title) {
+    public Album(String title, Date release_date, Artist artist) {
         this.title = title;
         this.release_date = release_date;
         this.artist = artist;
-        this.songs = new ArrayList<>(); // Inițializăm lista de melodii
+        this.songs = new ArrayList<>();
     }
 
     public String getTitle() {
@@ -46,26 +46,20 @@ public class Album {
         return songs;
     }
 
-    public void add_song(Song song) {
-        songs.add(song);
-        System.out.println("Song " + song.getTitle() + " has been added to album " + title + ".");
+    public void addSong(Song song) {
+        if (!songs.contains(song)) {
+            songs.add(song);
+            System.out.println("Song " + song.getTitle() + " has been added to album " + title + ".");
+        } else {
+            System.out.println("Song " + song.getTitle() + " is already in album " + title + ".");
+        }
     }
 
     public String getName() {
         return name;
     }
-    
-    public void setName(){
-        this.name=name;
-    }
 
-    public void addSong(String song) {
-        if (!songs.contains(song)) {
-            songs.add(song);
-            System.out.println("Song " + song.getBytes() + " has been added to album " + title + ".");
-        } else {
-            System.out.println("Song " + song.getBytes() + " is already in album " + title + ".");
-        }
+    public void setName(String name) {
+        this.name = name;
     }
-}
 }
