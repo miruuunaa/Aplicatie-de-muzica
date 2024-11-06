@@ -46,7 +46,9 @@ Die LiveConcert-Klasse repräsentiert ein virtuelles Live-Konzert. Sie umfasst A
 
 13. RecommendationService
 Die RecommendationService-Klasse bietet personalisierte Musikempfehlungen basierend auf der Wiedergabehistorie und den bevorzugten Genres eines Nutzers. Sie enthält Methoden wie get_top_genres(), recommend_artists() und recommend_songs().
-#-----------------------------------------------------------------------------------------------------------------------------------
+
+#-----------------------------------------------------------------
+
 The application called “MTIFY Music” offers the possibility to listen to the most popular music genres at the highest quality.
 Offers the possibility to participate in live concerts.
 The advantages of a premium account are:
