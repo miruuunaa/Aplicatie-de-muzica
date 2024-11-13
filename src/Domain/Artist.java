@@ -1,42 +1,125 @@
 package Domain;
-
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-
-public class Artist extends User {
+/**
+ * The Artist class represents an artist user, extending from the User class.
+ * It includes information specific to an artist, such as their albums and followers.
+ */
+public class Artist extends User  {
+    protected int id;
     private List<Album> albums;
+    private List<Listener> followers;
 
+    /**
+     * Constructor for the Artist class.
+     * Initializes an artist with the specified name and email and initializes empty lists for albums and followers.
+     *
+     * @param name The name of the artist
+     * @param email The email address of the artist
+     */
     public Artist(String name, String email) {
         super(name, email);
         this.albums = new ArrayList<>();
+        this.followers = new ArrayList<>();
     }
-
+    /**
+     * Gets the unique identifier of the artist.
+     *
+     * @return The ID of the artist
+     */
+    public int getId() {
+        return id;
+    }
+    /**
+     * Sets the unique identifier for the artist.
+     *
+     * @param id The new ID to assign to the artist
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+    /**
+     * Logs the artist in by displaying a login message.
+     */
     @Override
     public void login() {
-        System.out.println(getName() + " has logged in as Artist.");
+        System.out.println(Artist.super.getName() + " logged in as artist.");
     }
-
+    /**
+     * Logs the artist out by displaying a logout message.
+     */
     @Override
     public void logout() {
-        System.out.println(getName() + " has logged out.");
+        System.out.println(Artist.super.getName() + " logged out.");
     }
-
-    public void uploadSong(Song song) {
-        System.out.println(getName() + " uploaded the song: " + song.getTitle());
-    }
-
-    public void createAlbum(String albumTitle, Date releaseDate) {
-        Album newAlbum = new Album(albumTitle, releaseDate, this);
-        albums.add(newAlbum);
-        System.out.println("Created album: " + albumTitle);
-    }
-
+    /**
+     * Retrieves the list of albums created by the artist.
+     *
+     * @return A list of the artist's albums
+     */
     public List<Album> getAlbums() {
         return albums;
     }
-
+    /**
+     * Sets the list of albums for the artist.
+     *
+     * @param albums The list of albums to assign to the artist
+     */
     public void setAlbums(List<Album> albums) {
         this.albums = albums;
+    }
+
+    /**
+     * Adds an album to the artist's list if it is not already present.
+     *
+     * @param album The album to add to the artist's album list
+     */
+
+    public void addAlbum(Album album) {
+        if (!albums.contains(album)) {
+            albums.add(album);  // Adaugă albumul la lista de albume a artistului
+            System.out.println("Album '" + album.getTitle() + "' added to artist " + this.getName());
+        } else {
+            System.out.println("Album '" + album.getTitle() + "' is already added to " + this.getName());
+        }
+    }
+
+
+    /**
+     * Retrieves the list of followers for the artist.
+     *
+     * @return A list of listeners following the artist
+     */
+    public List<Listener> getFollowers() {
+        return followers;
+    }
+    /**
+     * Adds a listener as a follower to the artist if they are not already following.
+     *
+     * @param listener The listener to add as a follower
+     */
+
+    public void addFollower(Listener listener) {
+        if (!followers.contains(listener)) {
+            followers.add(listener);
+            System.out.println(listener.getName() + " is now following " + getName() + ".");
+        } else {
+            System.out.println(listener.getName() + " is already following " + getName() + ".");
+        }
+    }
+
+    /**
+     * Provides a string representation of the artist, including their ID, name, albums, and followers.
+     *
+     * @return A string representation of the artist
+     */
+    @Override
+    public String toString() {
+        return "Artist{" +
+                "id=" + id +
+                ", name='" + getName() + '\'' +
+                ", albums=" + albums +
+                ", followers=" + followers +
+                '}';
     }
 }
