@@ -39,7 +39,7 @@ public class PlaylistService {
      * @param song The song to be removed from the playlist.
      */
     public void removeSongFromPlaylist(Playlist playlist, Song song) {
-        if (playlist.removeSong(song)) { // utilizează metoda removeSong din Playlist
+        if (playlist.removeSong(song)) {
             System.out.println(song.getTitle() + " removed from playlist.");
         } else {
             System.out.println("Song not found in playlist.");

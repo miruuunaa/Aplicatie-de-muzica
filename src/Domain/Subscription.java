@@ -69,32 +69,7 @@ public class Subscription  {
     public void setUser(Listener user) {
         this.user = user;
     }
-    /**
-     * Upgrades the subscription from "Basic" to "Premium".
-     * If the subscription is already "Premium", it outputs a message that no upgrade is available.
-     * If the current type is not "Basic" or "Premium", it outputs an error message.
-     */
 
-    public void upgrade() {
-        if ("Basic".equalsIgnoreCase(type)) {
-            type = "Premium"; // Upgrade de la Basic la Premium
-            price = 9.99f;
-        } else if ("Premium".equalsIgnoreCase(type)) {
-            System.out.println("Already on Premium subscription. No upgrade available.");
-        } else {
-            System.out.println("Invalid subscription type. Cannot upgrade.");
-        }
-    }
-    /**
-     * Cancels the subscription, setting its type to "None" and price to 0.0F.
-     * Outputs a message indicating that the subscription has been canceled.
-     */
-    public void cancel() {
-        type="None";
-        price= 0.0F;
-        System.out.println("Abonamentul a fost anulat");
-
-    }
     /**
      * Gets the unique identifier for the subscription.
      *

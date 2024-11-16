@@ -35,7 +35,6 @@ public class SubscriptionService {
      */
 
     public void upgradeSubscription(Listener listener, String newType) {
-        // Verificăm dacă utilizatorul are deja un abonament
         Subscription currentSubscription = listener.getSubscription();
 
         if (currentSubscription == null) {
@@ -75,27 +74,23 @@ public class SubscriptionService {
         }
     }
 
-    // Crearea unui abonament pentru un listener
+    /**
+     * Creates a subscription for a listener based on the provided username and subscription type.
+     * @param listener The username of the listener who will be assigned the subscription.
+     * @param subscriptionType The type of subscription to be created for the listener (e.g., "Premium" or "Basic").
+     */
     public void createSubscription(Listener listener, String subscriptionType) {
-        // Verificăm dacă tipul abonamentului este valid
+
         if (!subscriptionType.equals("basic") && !subscriptionType.equals("premium")) {
             System.out.println("Invalid subscription type.");
             return;
         }
-
-        // Creăm abonamentul cu tipul și prețul corect
         float price = (subscriptionType.equals("basic")) ? 9.99f : 14.99f;
         Subscription subscription = new Subscription(subscriptionType, price, listener);
-
-        // Salvăm abonamentul în repository
         subscriptionRepository.create(subscription);
-
-        // Asociem abonamentul cu listener-ul
         listener.setSubscription(subscription);
-
-        // Confirmare
         System.out.println("Subscription created successfully for " + listener.getName() + " as " + subscriptionType+"!");
-}
+    }
     /**
      * Cancels the subscription of a listener (user).
      * If the listener has an active subscription, this method deletes the subscription from
@@ -110,16 +105,16 @@ public class SubscriptionService {
         if (subscription != null) {
             int subscriptionId = subscription.getId();
             if (subscriptionId != 0) {
-                subscriptionRepository.delete(subscriptionId);  // Șterge abonamentul
-                listener.setSubscription(null);  // Anulează abonamentul pentru listener
+                subscriptionRepository.delete(subscriptionId);
+                listener.setSubscription(null);
                 System.out.println("Subscription canceled for " + listener.getName());
-                return true;  // Returnează true pentru a indica succesul
+                return true;
             } else {
                 System.out.println("Invalid subscription ID.");
             }
         } else {
             System.out.println("No subscription found for " + listener.getName());
         }
-        return false;  // Dacă nu a fost anulat, returnează false
+        return false;
     }
 }

@@ -103,7 +103,7 @@ public class Playlist implements Playable {
      * @return true if the song was found and removed, false otherwise
      */
     public boolean removeSong(Song song) {
-        return songs.remove(song); // elimină piesa și returnează true dacă a fost găsită și eliminată
+        return songs.remove(song);
     }
     /**
      * Plays all songs in the playlist in sequence.
@@ -113,7 +113,7 @@ public class Playlist implements Playable {
     public void play() {
         System.out.println("Playing playlist: " + name);
         for (Song song : songs) {
-            song.play(); // Redăm fiecare melodie din playlist
+            song.play();
         }
     }
     /**

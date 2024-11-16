@@ -376,18 +376,6 @@ public class MusicController {
     public boolean checkTicketAvailability(String concertTitle) {
         return liveConcertService.checkTicketAvailability(concertTitle);
     }
-
-    /**
-     * Checks if a listener has access to a concert.
-     *
-     * @param listener The listener to check.
-     * @param concert The concert to check access for.
-     * @return True if the listener has access, false otherwise.
-     */
-    public boolean checkUserAccess(Listener listener,LiveConcert concert){
-        return liveConcertService.checkUserAccess(listener,concert);
-    }
-
     /**
      * Ends a live concert by title.
      *
@@ -436,7 +424,16 @@ public class MusicController {
     }
 
 
-
+    /**
+     * Calculates the VIP score for a listener and a specific concert.
+     *
+     * @param listener The listener for whom the score is calculated.
+     * @param concertId The ID of the concert.
+     * @return The calculated VIP score.
+     */
+    public double getConcertVIPScore(Listener listener, int concertId) {
+        return liveConcertService.calculateConcertVIPScore(listener, concertId);
+    }
 
     // ----------------- RECOMMENDATION METHODS -----------------
 
@@ -531,19 +528,26 @@ public class MusicController {
         return subscriptionService.cancelSubscription(listener);
     }
 
-    // Crearea unui abonament pentru un listener
-    public void createListenerSubscription(String username, String subscriptionType) {
-        // Găsește listener-ul după nume
-        Listener listener = getListenerByName(username);
 
+    /**
+     * Create the subscription for the user
+     *
+     * @param username The username of the listener who will be assigned the subscription.
+     * @param subscriptionType The type of subscription to be created for the listener (e.g., "Premium" or "Basic").
+     */
+    public void createListenerSubscription(String username, String subscriptionType) {
+        Listener listener = getListenerByName(username);
         if (listener == null) {
             System.out.println("Listener not found. Please create an account first.");
             return;
         }
-
-        // Apelăm metoda din SubscriptionService pentru a crea abonamentul
         subscriptionService.createSubscription(listener, subscriptionType);
     }
+    /**
+     * Sets the current listener for the session.
+     *
+     * @param listener The listener to be set as the current listener in the system.
+     */
     public void setCurrentListener(Listener listener){
         this.currentListener=listener;
     }

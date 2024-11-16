@@ -14,13 +14,13 @@ public class LiveConcert {
     private Date date;
     private Artist artist;
     private int ticketCount;
-    private boolean isTicketRequired;
-    private boolean isPremiumOnly;
     private boolean isAvailablePostLive;
     private String eventType;
-    private List<Listener> attendees;  // Publicul care a participat la concert
+    private List<Listener> earlyAccessList; // Premium user
+    private List<Listener> regularAccesList; //Basic user
     private boolean started;
     private boolean ended;
+
     /**
      * Constructs a LiveConcert instance with specified parameters.
      *
@@ -28,21 +28,18 @@ public class LiveConcert {
      * @param date              The date of the concert
      * @param artist            The artist performing in the concert
      * @param ticketCount       The number of tickets available for the concert
-     * @param isTicketRequired  Indicates if a ticket is required for the concert
-     * @param isPremiumOnly     Indicates if the concert is only accessible to premium users
-     * @param isAvailablePostLive Indicates if the concert is available post-live
+     * @param isAvailablePostLive   Indicates if the concert is available post-live
      * @param eventType         The type of the concert event (e.g., live show, private event)
      */
-    public LiveConcert(String title, Date date, Artist artist, int ticketCount, boolean isTicketRequired, boolean isPremiumOnly, boolean isAvailablePostLive, String eventType) {
+    public LiveConcert(String title, Date date, Artist artist, int ticketCount,boolean isAvailablePostLive,String eventType) {
         this.title = title;
         this.date = date;
         this.artist = artist;
         this.ticketCount = ticketCount;
-        this.isTicketRequired = isTicketRequired;
-        this.isPremiumOnly = isPremiumOnly;
-        this.isAvailablePostLive = isAvailablePostLive;
+        this.isAvailablePostLive=isAvailablePostLive;
         this.eventType = eventType;
-        this.attendees=new ArrayList<>();
+        this.earlyAccessList = new ArrayList<>();
+        this.regularAccesList = new ArrayList<>();
 
     }
     /** Getter and setter methods for accessing and modifying concert attributes **/
@@ -54,12 +51,12 @@ public class LiveConcert {
         this.id = id;
     }
 
-    public List<Listener> getAttendees() {
-        return attendees;
+    public List<Listener> getEarlyAccessList() {
+        return earlyAccessList;
     }
 
-    public void setAttendees(List<Listener> attendees) {
-        this.attendees = attendees;
+    public List<Listener> getRegularAccesList() {
+        return regularAccesList;
     }
 
     public boolean isEnded() {
@@ -77,45 +74,13 @@ public class LiveConcert {
     public void setStarted(boolean started) {
         this.started = started;
     }
-    /**
-     * Checks if tickets are available for the concert.
-     *
-     * @return True if tickets are available, false otherwise
-     */
-    public boolean checkTicketAvailability() {
-        return ticketCount > 0;
-    }
-    /**
-     * Verifies if the user has access to the concert.
-     *
-     * @param user The user attempting to access the concert
-     * @return True if the user has access, false if they lack the required access level
-     */
-    public boolean checkUserAccess(User user) {
-        if (isPremiumOnly && !(user instanceof PremiumUser)) {
-            return false;
-        }
-        return true;
-    }
 
     public void setTicketCount(int ticketCount) {
         this.ticketCount = ticketCount;
     }
 
-    public void setTicketRequired(boolean ticketRequired) {
-        this.isTicketRequired = ticketRequired;
-    }
-
-    public void setPremiumOnly(boolean premiumOnly) {
-        this.isPremiumOnly = premiumOnly;
-    }
-
     public void setAvailablePostLive(boolean availablePostLive) {
         this.isAvailablePostLive = availablePostLive;
-    }
-
-    public boolean isTicketRequired() {
-        return isTicketRequired;
     }
 
     public int getTicketCount() {
@@ -159,6 +124,19 @@ public class LiveConcert {
     public Date getDate() {
         return date;
     }
+
+    public int getAvailableSeats() {
+        return ticketCount - (earlyAccessList.size() + regularAccesList.size());
+    }
+
+    public int getTicketsSold() {
+        return earlyAccessList.size() + regularAccesList.size();
+    }
+
+    public boolean isArtistFamous() {
+        return artist.getFollowers().size() > 6;
+    }
+
     /**
      * Provides a string representation of the concert, including key attributes.
      *
@@ -171,11 +149,7 @@ public class LiveConcert {
                 ", date=" + date +
                 ", artist=" + artist +
                 ", ticketCount=" + ticketCount +
-                ", isTicketRequired=" + isTicketRequired +
-                ", isPremiumOnly=" + isPremiumOnly +
-                ", isAvailablePostLive=" + isAvailablePostLive +
                 ", eventType='" + eventType + '\'' +
-                ", attendees=" + attendees +
                 '}';
     }
 

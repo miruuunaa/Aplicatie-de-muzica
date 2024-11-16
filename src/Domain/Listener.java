@@ -24,6 +24,7 @@ public class Listener extends User {
         super(name, email);
         this.playlists = new ArrayList<>();
         this.history = new History(this);
+        this.subscription=null;
     }
 
     /**
@@ -90,6 +91,14 @@ public class Listener extends User {
         return playlists;
     }
     /**
+     * Checks if the listener has a premium subscription.
+     *
+     * @return true if the subscription type is "Premium", false otherwise.
+     */
+    public boolean hasPremiumSubscription() {
+        return subscription != null && "Premium".equalsIgnoreCase(subscription.getType());
+    }
+    /**
      * Provides a string representation of the listener, including name, email, and the count of history items.
      *
      * @return A string describing the listener
@@ -98,8 +107,6 @@ public class Listener extends User {
     public String toString() {
         return "Listener{" +
                 "name='" + getName() + '\'' +
-                ", email='" + getEmail() + '\'' +
-                ", historyCount=" + history.size() +
-                '}';
+                ", email='" + getEmail() + '\'' + '}';
     }
 }

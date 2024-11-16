@@ -77,7 +77,7 @@ public class Artist extends User  {
 
     public void addAlbum(Album album) {
         if (!albums.contains(album)) {
-            albums.add(album);  // Adaugă albumul la lista de albume a artistului
+            albums.add(album);
             System.out.println("Album '" + album.getTitle() + "' added to artist " + this.getName());
         } else {
             System.out.println("Album '" + album.getTitle() + "' is already added to " + this.getName());
@@ -92,20 +92,6 @@ public class Artist extends User  {
      */
     public List<Listener> getFollowers() {
         return followers;
-    }
-    /**
-     * Adds a listener as a follower to the artist if they are not already following.
-     *
-     * @param listener The listener to add as a follower
-     */
-
-    public void addFollower(Listener listener) {
-        if (!followers.contains(listener)) {
-            followers.add(listener);
-            System.out.println(listener.getName() + " is now following " + getName() + ".");
-        } else {
-            System.out.println(listener.getName() + " is already following " + getName() + ".");
-        }
     }
 
     /**

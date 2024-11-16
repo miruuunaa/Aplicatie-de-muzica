@@ -55,8 +55,6 @@ public class MusicApp {
      */
     private static IRepository<Artist> createInMemoryArtistRepository() {
         IRepository<Artist> artistRepo = new InMemoryRepository<>();
-
-
         artistRepo.create(new Artist("The Beatles", "beatles@gmail.com"));
         artistRepo.create(new Artist("Beyonce", "beyonceles@gmail.com"));
         artistRepo.create(new Artist("Adele", "adele@gmail.com"));
@@ -77,9 +75,7 @@ public class MusicApp {
         artistRepo.create(new Artist("Dua Lipa", "dua.lipa@example.com"));
         artistRepo.create(new Artist("Harry Styles", "harry.styles@example.com"));
         artistRepo.create(new Artist("Eminem", "eminem@example.com"));
-
         artistRepo.getAll().values().forEach(System.out::println);
-
         return artistRepo;
     }
 
@@ -91,13 +87,11 @@ public class MusicApp {
      */
     private static IRepository<Song> createInMemorySongRepository(IRepository<Album> albumRepo) {
         IRepository<Song> songRepo = new InMemoryRepository<>();
-
         Genre rock = new Genre("Rock");
         Genre pop = new Genre("Pop");
         Genre rap = new Genre("Rap");
         Genre hipHop = new Genre("Hip Hop");
         Genre electronic = new Genre("Electronic");
-
         createSongIfAlbumExists(songRepo, albumRepo, 1, "Here Comes the Sun", 3.05f,rock);
         createSongIfAlbumExists(songRepo, albumRepo, 1, "Come Together", 4.20f,rock);
         createSongIfAlbumExists(songRepo, albumRepo, 2, "Formation", 4.15f,pop);
@@ -119,9 +113,7 @@ public class MusicApp {
         createSongIfAlbumExists(songRepo, albumRepo, 18, "Levitating", 3.24f,electronic);
         createSongIfAlbumExists(songRepo, albumRepo, 19, "Watermelon Sugar", 3.10f,pop);
         createSongIfAlbumExists(songRepo, albumRepo, 20, "Lose Yourself", 5.20f,rap);
-
         songRepo.getAll().values().forEach(System.out::println);
-
         return songRepo;
     }
     /**
@@ -139,7 +131,7 @@ public class MusicApp {
         if (album != null) {
             Song song = new Song(songName, duration, album);
             if (genre != null) {
-                song.setGenre(genre); // Setăm genul piesei doar dacă nu este null
+                song.setGenre(genre);
             }
             songRepo.create(song);
             album.addSong(song);
@@ -183,18 +175,14 @@ public class MusicApp {
         createAlbumIfArtistExists(albumRepo, artistRepo, 18, "Future Nostalgia", LocalDate.of(2020, 3, 27),electronic);
         createAlbumIfArtistExists(albumRepo, artistRepo, 19, "Fine Line", LocalDate.of(2019, 12, 13),pop);
         createAlbumIfArtistExists(albumRepo, artistRepo, 20, "8 Mile Soundtrack", LocalDate.of(2002, 10, 29),rap);
-
-        // Afișăm toate albumele
         albumRepo.getAll().values().forEach(System.out::println);
-
         return albumRepo;
     }
-
     private static void createAlbumIfArtistExists(IRepository<Album> albumRepo, IRepository<Artist> artistRepo, int artistId, String albumName, LocalDate releaseDate, Genre genre) {
         Artist artist = artistRepo.get(artistId);
         if (artist != null) {
-            Album album = new Album(albumName, releaseDate, artist); // Creăm albumul fără gen
-            album.setGenre(genre); // Setăm genul folosind setter-ul
+            Album album = new Album(albumName, releaseDate, artist);
+            album.setGenre(genre);
             albumRepo.create(album);
         } else {
             System.out.println("Artistul cu ID-ul " + artistId + " nu a fost găsit. Albumul '" + albumName + "' nu a fost adăugat.");
@@ -228,11 +216,7 @@ public class MusicApp {
         listenerRepo.create(new Listener("Monica Geller", "monica.geller@example.com"));
         listenerRepo.create(new Listener("Nick Fury", "nick.fury@example.com"));
         listenerRepo.create(new Listener("Olivia Pope", "olivia.pope@example.com"));
-
-
-        // Afișăm toți utilizatorii
         listenerRepo.getAll().values().forEach(System.out::println);
-
         return listenerRepo;
     }
 
@@ -264,8 +248,6 @@ public class MusicApp {
         Subscription sub18=new Subscription("Basic", 9.99f, listenerRepo.get(13));   // Monica Geller
         Subscription sub19=new Subscription("Premium", 14.99f, listenerRepo.get(14)); // Nick Fury
         Subscription sub20=new Subscription("Basic", 9.99f, listenerRepo.get(15));  // Olivia Pope
-
-        // Asociază abonamentele la ascultători
         Listener john = listenerRepo.get(1);
         Listener jane = listenerRepo.get(2);
         Listener chris = listenerRepo.get(3);
@@ -346,7 +328,6 @@ public class MusicApp {
         if (olivia != null) {
             olivia.setSubscription(sub20);
         }
-
         subscriptionRepo.create(sub1);
         subscriptionRepo.create(sub2);
         subscriptionRepo.create(sub3);
@@ -367,9 +348,7 @@ public class MusicApp {
         subscriptionRepo.create(sub18);
         subscriptionRepo.create(sub19);
         subscriptionRepo.create(sub20);
-
         subscriptionRepo.getAll().values().forEach(System.out::println);
-
         return subscriptionRepo;
     }
 
@@ -381,46 +360,27 @@ public class MusicApp {
      */
     private static IRepository<LiveConcert> createInMemoryLiveConcertRepository( IRepository<Artist> artistRepo) {
         IRepository<LiveConcert> concertRepo = new InMemoryRepository<>();
-        concertRepo.create(new LiveConcert("The Beatles Live at Abbey Road", new Date(), artistRepo.get(1), 5000, true, true, true, "Live"));
-        concertRepo.create(new LiveConcert("Beyoncé World Concert", new Date(), artistRepo.get(2), 10000, true, true, true, "Live"));
-        concertRepo.create(new LiveConcert("Adele Live Concert", new Date(),artistRepo.get(3), 8000, true, false, true, "Live"));
-        concertRepo.create(new LiveConcert("Ed Sheeran Divide Concert", new Date(), artistRepo.get(4), 12000, true, true, false, "Live"));
-        concertRepo.create(new LiveConcert("Metallica Concert", new Date(), artistRepo.get(5), 15000, true, false, false, "Live"));
-        concertRepo.create(new LiveConcert("Taylor Swift Reputation Concert", new Date(), artistRepo.get(6), 14000, true, true, true, "Live"));
-        concertRepo.create(new LiveConcert("Drake Summer Sixteen", new Date(), artistRepo.get(7), 9000, true, true, false, "Live"));
-        concertRepo.create(new LiveConcert("Ariana Grande Dangerous Woman Concert", new Date(), artistRepo.get(8), 11000, true, false, true, "Live"));
-        concertRepo.create(new LiveConcert("Billie Eilish When We All Fall Asleep", new Date(), artistRepo.get(9), 13000, true, true, false, "Live"));
-        concertRepo.create(new LiveConcert("Bruno Mars 24K Magic Concert", new Date(), artistRepo.get(10), 7000, true, true, true, "Live"));
-        concertRepo.create(new LiveConcert("Justin Bieber Purpose Concert", new Date(), artistRepo.get(11), 6000, true, false, true, "Live"));
-        concertRepo.create(new LiveConcert("The Weeknd After Hours Concert", new Date(), artistRepo.get(12), 10000, true, true, true, "Live"));
-        concertRepo.create(new LiveConcert("Lady Gaga Chromatica Ball", new Date(),artistRepo.get(13), 8000, true, false, false, "Live"));
-        concertRepo.create(new LiveConcert("Kendrick Lamar DAMN Concert", new Date(),artistRepo.get(14), 9500, true, true, false, "Live"));
-        concertRepo.create(new LiveConcert("Post Malone Hollywood's Bleeding Concert", new Date(),artistRepo.get(15), 12000, true, false, true, "Live"));
-        concertRepo.create(new LiveConcert("Cardi B Invasion of Privacy Tour", new Date(), artistRepo.get(16), 8500, true, true, false, "Live"));
-        concertRepo.create(new LiveConcert("Shawn Mendes Wonder Tour", new Date(), artistRepo.get(17), 9500, true, false, true, "Live"));
-        concertRepo.create(new LiveConcert("Dua Lipa Future Nostalgia Tour", new Date(), artistRepo.get(18), 11000, true, true, true, "Live"));
-        concertRepo.create(new LiveConcert("Harry Styles Love On Tour", new Date(), artistRepo.get(19), 12000, true, true, false, "Live"));
-        concertRepo.create(new LiveConcert("Eminem Revival Tour", new Date(), artistRepo.get(20), 15000, true, false, true, "Live"));
-
-
-
-        // Afișează toate concertele din repository
+        concertRepo.create(new LiveConcert("The Beatles Live at Abbey Road", new Date(), artistRepo.get(1), 5000, true, "Live")); //1
+        concertRepo.create(new LiveConcert("Beyoncé World Concert", new Date(), artistRepo.get(2), 10000, true,  "Live")); //2
+        concertRepo.create(new LiveConcert("Adele Live Concert", new Date(),artistRepo.get(3), 8000, true,  "Live")); //3
+        concertRepo.create(new LiveConcert("Ed Sheeran Divide Concert", new Date(), artistRepo.get(4), 12000, true,  "Live")); //4
+        concertRepo.create(new LiveConcert("Metallica Concert", new Date(), artistRepo.get(5), 15000, true,  "Live")); //5
+        concertRepo.create(new LiveConcert("Taylor Swift Reputation Concert", new Date(), artistRepo.get(6), 14000, true,  "Live")); //6
+        concertRepo.create(new LiveConcert("Drake Summer Sixteen", new Date(), artistRepo.get(7), 9000, true,  "Live")); //7
+        concertRepo.create(new LiveConcert("Ariana Grande Dangerous Woman Concert", new Date(), artistRepo.get(8), 11000, true,  "Live")); //8
+        concertRepo.create(new LiveConcert("Billie Eilish When We All Fall Asleep", new Date(), artistRepo.get(9), 13000, true,  "Live")); //9
+        concertRepo.create(new LiveConcert("Bruno Mars 24K Magic Concert", new Date(), artistRepo.get(10), 7000, true,  "Live")); //10
+        concertRepo.create(new LiveConcert("Justin Bieber Purpose Concert", new Date(), artistRepo.get(11), 6000, true, "Live")); //11
+        concertRepo.create(new LiveConcert("The Weeknd After Hours Concert", new Date(), artistRepo.get(12), 10000, true,  "Live")); //12
+        concertRepo.create(new LiveConcert("Lady Gaga Chromatica Ball", new Date(),artistRepo.get(13), 100, true,  "Live")); //13
+        concertRepo.create(new LiveConcert("Kendrick Lamar DAMN Concert", new Date(),artistRepo.get(14), 9500, true,  "Live")); //14
+        concertRepo.create(new LiveConcert("Post Malone Hollywood's Bleeding Concert", new Date(),artistRepo.get(15), 12000, true,  "Live")); //15
+        concertRepo.create(new LiveConcert("Cardi B Invasion of Privacy Tour", new Date(), artistRepo.get(16), 8500, true, "Live")); //16
+        concertRepo.create(new LiveConcert("Shawn Mendes Wonder Tour", new Date(), artistRepo.get(17), 9500, true,  "Live")); //17
+        concertRepo.create(new LiveConcert("Dua Lipa Future Nostalgia Tour", new Date(), artistRepo.get(18), 11000, true,  "Live")); //18
+        concertRepo.create(new LiveConcert("Harry Styles Love On Tour", new Date(), artistRepo.get(19), 12000, true,  "Live")); //19
+        concertRepo.create(new LiveConcert("Eminem Revival Tour", new Date(), artistRepo.get(20), 15000, true,  "Live")); //20
         concertRepo.getAll().values().forEach(System.out::println);
-
         return concertRepo;
     }
-
-    // Creează o listă de genuri
-    private static List<Genre> createGenres() {
-        List<Genre> genres = new ArrayList<>();
-        genres.add(new Genre("Rock"));
-        genres.add(new Genre("Pop"));
-        genres.add(new Genre("Hip Hop"));
-        genres.add(new Genre("Jazz"));
-        genres.add(new Genre("Classical"));
-        genres.add(new Genre("Electronic"));
-
-        return genres;
-    }
-
 }
