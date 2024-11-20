@@ -124,7 +124,7 @@ public class Album {
         return "Album{" +
                 "title='" + title + '\'' +
                 ", releaseDate=" + releaseDate +
-                ", artist=" + artist.getName() +  // Afișează numele artistului
+                ", artist=" + artist.getName() +
                 '}';
     }
 }

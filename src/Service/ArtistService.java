@@ -5,7 +5,9 @@ import Domain.Artist;
 import Domain.Listener;
 import Domain.Song;
 import Repository.IRepository;
-import java.util.List;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The ArtistService class provides methods for managing artists within the music system.
@@ -90,6 +92,79 @@ public class ArtistService {
             }
         }
     }
+
+    /**
+     * Filters albums by genre for a specific artist.
+     *
+     * @param artistId The ID of the artist.
+     * @param genreName The genre name to filter albums by.
+     * @return List of albums matching the genre.
+     */
+    public List<Album> filterAlbumsByGenre(int artistId, String genreName) {
+        Artist artist = artistRepository.get(artistId);
+        if (artist != null) {
+            return artist.getAlbums().stream()
+                    .filter(album -> album.getGenre().getName().equalsIgnoreCase(genreName))
+                    .collect(Collectors.toList());
+        } else {
+            System.out.println("Artist not found.");
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Filters songs by minimum duration for a specific artist.
+     *
+     * @param artistId The ID of the artist.
+     * @param minDuration Minimum duration of the songs to be returned.
+     * @return List of songs with duration greater than or equal to minDuration.
+     */
+    public List<Song> filterSongsByMinimumDuration(int artistId, float minDuration) {
+        Artist artist = artistRepository.get(artistId);
+        if (artist != null) {
+            return artist.getAlbums().stream()
+                    .flatMap(album -> album.getSongs().stream())
+                    .filter(song -> song.getDuration() >= minDuration)
+                    .collect(Collectors.toList());
+        } else {
+            System.out.println("Artist not found.");
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Sort albums by their release date
+     *
+     * @param artistId the id of the artist
+     * @return list of sorted albums by the release date
+     */
+    public List<Album> sortAlbumsByReleaseDate(int artistId) {
+        Artist artist = artistRepository.get(artistId);
+        return artist.getAlbums().stream()
+                .sorted(Comparator.comparing(Album::getReleaseDate))
+                .collect(Collectors.toList());
+    }
+    /**
+     * Calculates the total number of songs for each artist and sorts them by the number of songs.
+     * It also considers the total number of albums for each artist.
+     *
+     * @return List of artists sorted by the total number of songs and albums.
+     */
+    public List<Artist> getArtistsWithMostSongsAndAlbums() {
+        Map<Artist, Integer> artistSongCountMap = new HashMap<>();
+        for (Artist artist : artistRepository.getAll().values()) {
+            int totalSongs = artist.getAlbums().stream()
+                    .mapToInt(album -> album.getSongs().size())
+                    .sum();
+            artistSongCountMap.put(artist, totalSongs);
+        }
+        return artistSongCountMap.entrySet().stream()
+                .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+    }
+
+
 
 
 }
