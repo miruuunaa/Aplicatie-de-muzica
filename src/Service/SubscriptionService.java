@@ -85,7 +85,7 @@ public class SubscriptionService {
             System.out.println("Invalid subscription type.");
             return;
         }
-        float price = (subscriptionType.equals("basic")) ? 9.99f : 14.99f;
+        float price = (subscriptionType.equals("basic")) ? BASIC_PRICE : PREMIUM_PRICE;
         Subscription subscription = new Subscription(subscriptionType, price, listener);
         subscriptionRepository.create(subscription);
         listener.setSubscription(subscription);

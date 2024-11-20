@@ -12,8 +12,9 @@ import java.util.Scanner;
 public class MusicKonsole {
     private final MusicController musicController;
     private final Scanner scanner;
-    /*** Constructs a MusicKonsole object with the provided MusicController.
-     * Initializes the scanner for user input
+    private Listener currentListener = null;
+    private Artist currentArtist = null;
+    /**Constructs a MusicKonsole object with the provided MusicController.
      * @param musicController The controller used to handle user requests and interactions.*/
     public MusicKonsole(MusicController musicController) {
         this.musicController = musicController;
@@ -22,8 +23,6 @@ public class MusicKonsole {
     /** Displays the main menu and navigates to the appropriate sub-menu based on the user's choice.
      * This method loops infinitely until the user exits the application.*/
     public void showMainMenu() {
-        Listener currentListener = null;
-        Artist currentArtist = null;
         while (true) {
             System.out.println("Welcome to the MTIFY Music!");
             System.out.println("1. Log in as Listener");
@@ -37,7 +36,7 @@ public class MusicKonsole {
                     currentListener = listenerLogin();
                     if (currentListener != null) {
                         listenerMenu();
-                        listenerLogout(currentListener);
+                        listenerLogout();
                         currentListener = null;
                     }
                     break;
@@ -45,7 +44,7 @@ public class MusicKonsole {
                     currentArtist = artistLogin();
                     if (currentArtist != null) {
                         artistMenu();
-                        artistLogout(currentArtist);
+                        artistLogout();
                         currentArtist = null;
                     }
                     break;
@@ -60,8 +59,7 @@ public class MusicKonsole {
             }
         }
     }
-    /** Displays the listener-specific menu and allows the listener to manage their playlists,
-     * songs, subscriptions, and other functionalities.
+    /** Displays the listener-specific menu and allows the listener to manage their playlists,songs, subscriptions, and other functionalities.
      * This method loops infinitely until the listener exits the menu.*/
     private void listenerMenu() {
         while (true) {
@@ -165,8 +163,6 @@ public class MusicKonsole {
                     break;
                 case 24:
                     showVIPScore();
-
-
                 case 25:
                     return;
                 default:
@@ -174,8 +170,7 @@ public class MusicKonsole {
             }
         }
     }
-    /**Displays the artist-specific menu and allows the artist to manage their albums, songs,
-     * concerts, and other functionalities.
+    /**Displays the artist-specific menu and allows the artist to manage their albums, songs,concerts, and other functionalities.
      * This method loops infinitely until the artist exits the menu.*/
     private void artistMenu() {
         while (true) {
@@ -190,7 +185,12 @@ public class MusicKonsole {
             System.out.println("8. Validate Album Songs");
             System.out.println("9. View Followers");
             System.out.println("10. View Attendees for Concert");
-            System.out.println("11. Back to Main Menu");
+            System.out.println("11. Filter Albums by Genre");
+            System.out.println("12. Filter Songs by Duration");
+            System.out.println("13. Sort albums by release date");
+            System.out.println("14. Sort songs by title");
+            System.out.println("15. Display artists by total number of songs and albums");
+            System.out.println("16. Back to Main Menu");
             int choice = scanner.nextInt();
             scanner.nextLine();
             switch (choice) {
@@ -223,7 +223,22 @@ public class MusicKonsole {
                     break;
                 case 10:
                     viewAttendeesForConcert();
+                    break;
                 case 11:
+                    filterAlbumsByGenre();
+                    break;
+                case 12:
+                    filterSongsByDuration();
+                    break;
+                case 13:
+                    sortAlbumsByReleaseDate();
+                    break;
+                case 14:
+                    sortSongsByTitle();
+                    break;
+                case 15:
+                    displayArtistsWithMostSongsAndAlbums();
+                case 16:
                     return;
                 default:
                     System.out.println("Invalid choice. Please try again.");
@@ -238,6 +253,7 @@ public class MusicKonsole {
         String username = scanner.nextLine();
         Listener listener = musicController.getListenerByName(username);
         if (listener != null) {
+            currentListener = listener;
             musicController.setCurrentListener(listener);
             listener.login();
             return listener;
@@ -246,10 +262,14 @@ public class MusicKonsole {
             return null;
         }
     }
-    /** Logs out the current listener.
-     * @param listener the currently logged-in Listener object.*/
-    private void listenerLogout(Listener listener) {
-        listener.logout();
+    /** Logs out the current listener.*/
+    private void listenerLogout() {
+        if (currentListener != null) {
+            currentListener.logout();
+            currentListener = null;
+        } else {
+            System.out.println("No listener is currently logged in.");
+        }
     }
     /** Attempts to authenticate as an artist by prompting for a username.
      * If a valid artist is found, logs them in and returns the Artist object.
@@ -266,10 +286,14 @@ public class MusicKonsole {
             return null;
         }
     }
-    /** Logs out the current artist.
-     * @param artist the currently logged-in Artist object.*/
-    private void artistLogout(Artist artist) {
-        artist.logout();
+    /** Logs out the current artist.*/
+    private void artistLogout() {
+        if (currentArtist != null) {
+            currentArtist.logout();
+            currentArtist = null;
+        } else {
+            System.out.println("No artist is currently logged in.");
+        }
     }
     /** This method displays a menu allowing the user to choose between creating a Listener or Artist account.
      * Based on the user's choice, the corresponding account creation method is called.*/
@@ -291,8 +315,7 @@ public class MusicKonsole {
         }
     }
     /** Prompts the user to enter details for creating a Listener account. The user is asked for their name and email.
-     * A new Listener object is created and registered using the MusicController instance.
-     * A success message is displayed after the account is created.*/
+     * A new Listener object is created and registered using the MusicController instance.*/
     private void createListenerAccount() {
         System.out.println("Enter your name:");
         String name = scanner.nextLine();
@@ -303,8 +326,7 @@ public class MusicKonsole {
         System.out.println("Listener account created successfully! You can now log in as a Listener.");
     }
     /** Prompts the user to enter details for creating an Artist account. The user is asked for their name and email.
-     * A new Artist object is created and registered using the MusicController instance.
-     * A success message is displayed after the account is created.*/
+     * A new Artist object is created and registered using the MusicController instance.*/
     private void createArtistAccount() {
         System.out.println("Enter your name:");
         String name = scanner.nextLine();
@@ -316,47 +338,43 @@ public class MusicKonsole {
     }
     // ----------------- LISTENER MENU  METHODS -----------------
     /**1Follows an artist for a specific listener.
-     * Prompts the user for their listener name and the artist they wish to follow,
-     * and then enrolls the listener to follow that artist.*/
+     * Prompts the name of the artist they wish to follow,and then enrolls the listener to follow that artist.*/
     private void followArtist() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter username:");
-        String listenerName = scanner.nextLine();
-        Listener listener = musicController.getListenerByName(listenerName);
-        if (listener != null) {
-            System.out.println("Enter artist name to follow:");
-            String artistName = scanner.nextLine();
-            Artist artist = musicController.getArtistByName(artistName);
-            if (artist != null) {
-                musicController.enrollListenerToArtist(listener, artist);
-                System.out.println(listener.getName() + " is now following " + artist.getName() + ".");
-            } else {
-                System.out.println("Artist not found.");
+        if (currentListener == null) {
+            System.out.println("Please log in as a listener before proceeding.");
+            currentListener = listenerLogin();
+            if (currentListener == null) {
+                return;
             }
+        }
+        System.out.println("Enter artist name to follow:");
+        String artistName = scanner.nextLine();
+        Artist artist = musicController.getArtistByName(artistName);
+        if (artist != null) {
+            musicController.enrollListenerToArtist(currentListener, artist);
+            System.out.println(currentListener.getName() + " is now following " + artist.getName() + ".");
         } else {
-            System.out.println("Listener not found.");
+            System.out.println("Artist not found.");
         }
     }
     /**2Creates a new playlist for a listener.
-     * Prompts the user for their username and the name of the playlist they want to create.
-     * The new playlist is then added to the user's collection of playlists.*/
+     * Prompts the name of the playlist they want to create.then added to the user's collection of playlists.*/
     private void createPlaylist() {
-        System.out.println("Enter your username:");
-        String username = scanner.nextLine();
-        Listener user = musicController.getListenerByName(username);
-        if (user == null) {
-            System.out.println("User not found. Please make sure you are logged in.");
-            return;
+        if (currentListener == null) {
+            System.out.println("Please log in as a listener before proceeding.");
+            currentListener = listenerLogin();
+            if (currentListener == null) {
+                return;
+            }
         }
         System.out.println("Enter playlist name:");
         String playlistName = scanner.nextLine();
-        Playlist playlist = new Playlist(playlistName, user);
+        Playlist playlist = new Playlist(playlistName, currentListener);
         musicController.addPlaylist(playlist);
         System.out.println("Playlist " + playlistName + " created successfully.");
     }
     /**3Adds a song to a specific playlist.
-     * Prompts the user for the playlist and song they wish to add. If both are valid,
-     * the song is added to the specified playlist.*/
+     * Prompts the user for the playlist and song they wish to add. If both are valid,song is added to the specified playlist.*/
     private void addSongToPlaylist() {
         System.out.println("Enter playlist name:");
         String playlistName = scanner.nextLine();
@@ -376,8 +394,7 @@ public class MusicKonsole {
         }
     }
     /**4Removes a song from a specified playlist.
-     * Prompts the user for the playlist and song to remove. If both are valid,
-     * the song is removed from the playlist.*/
+     * Prompts the user for the playlist and song to remove. If both are valid,song is removed from the playlist.*/
     private void removeSongFromPlaylist() {
         Scanner scanner = new Scanner(System.in);
         String playlistName = scanner.nextLine();
@@ -465,7 +482,7 @@ public class MusicKonsole {
      * user to select a subscription type (Basic or Premium). If the listener
      * is not found, an account creation prompt is displayed.*/
     private void createSubscription() {
-        System.out.println("Enter Listener username:");
+        System.out.println("Enter your username:");
         String username = scanner.nextLine();
         Listener listener = musicController.getListenerByName(username);
         if (listener == null) {
@@ -476,7 +493,7 @@ public class MusicKonsole {
         System.out.println("1. Basic");
         System.out.println("2. Premium");
         int subscriptionChoice = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
         String subscriptionType = "";
         switch (subscriptionChoice) {
             case 1:
@@ -523,100 +540,102 @@ public class MusicKonsole {
         }
     }
     /**15Recommends songs to a listener based on their preferences or activity.
-     * Prompts the user for the listener's name and displays recommended songs for that listener.*/
+     *displays recommended songs for that listener.*/
     private void recommendSongs() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter your username to recommend songs:");
-        String listenerName = scanner.nextLine();
-        Listener listener = musicController.getListenerByName(listenerName);
-        if (listener != null) {
-            List<Song> recommendedSongs = musicController.recommendSongsForListener(listener);
-            System.out.println("Recommended Songs for " + listener.getName() + ":");
-            if (recommendedSongs.isEmpty()) {
-                System.out.println("No recommendations available.");
-            } else {
-                for (Song song : recommendedSongs) {
-                    System.out.println("- " + song.getTitle() + " by " + song.getAlbum().getArtist().getName());
-                }
+        if (currentListener == null) {
+            System.out.println("Please log in as a listener before proceeding.");
+            currentListener = listenerLogin();
+            if (currentListener == null) {
+                return;
             }
+        }
+        List<Song> recommendedSongs = musicController.recommendSongsForListener(currentListener);
+        System.out.println("Recommended Songs for " + currentListener.getName() + ":");
+        if (recommendedSongs.isEmpty()) {
+            System.out.println("No recommendations available.");
         } else {
-            System.out.println("Listener not found.");
+            for (Song song : recommendedSongs) {
+                System.out.println("- " + song.getTitle() + " by " + song.getAlbum().getArtist().getName());
+            }
         }
     }
     /**16Recommends a list of artists based on the listener's preferences.
-     * Prompts the user for their username, retrieves the listener, and fetches artist recommendations based on their listening habits.
+     * retrieves the listener, fetches artist recommendations based on their listening habits.
      * Displays the list of recommended artists.*/
     private void recommendArtists() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter your username to recommend artists:");
-        String listenerName = scanner.nextLine();
-        Listener listener = musicController.getListenerByName(listenerName);
-        if (listener != null) {
-            List<Artist> recommendedArtists = musicController.recommendArtistsForListener(listener);
-            System.out.println("Recommended Artists for " + listener.getName() + ":");
-            if (recommendedArtists.isEmpty()) {
-                System.out.println("No recommendations available.");
-            } else {
-                for (Artist artist : recommendedArtists) {
-                    System.out.println("- " + artist.getName());
-                }
+        if (currentListener == null) {
+            System.out.println("Please log in as a listener before proceeding.");
+            currentListener = listenerLogin();
+            if (currentListener == null) {
+                return;
             }
+        }
+        List<Artist> recommendedArtists = musicController.recommendArtistsForListener(currentListener);
+        System.out.println("Recommended Artists for " + currentListener.getName() + ":");
+        if (recommendedArtists.isEmpty()) {
+            System.out.println("No recommendations available.");
         } else {
-            System.out.println("Listener not found.");
+            for (Artist artist : recommendedArtists) {
+                System.out.println("- " + artist.getName());
+            }
         }
     }
     /**17Retrieves and displays the top genres for a specific listener.
-     * Prompts the user for their username and retrieves the top genres based on the listener's preferences.
+     * retrieves the top genres based on the listener's preferences.
      * Displays a list of top genres for the listener.*/
     private void getTopGenres() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter your username to get top genres:");
-        String listenerName = scanner.nextLine();
-        Listener listener = musicController.getListenerByName(listenerName);
-        if (listener != null) {
-            List<Genre> topGenres = musicController.getTopGenresForListener(listener);
-            System.out.println("Top Genres for " + listener.getName() + ":");
-            if (topGenres.isEmpty()) {
-                System.out.println("No genres found.");
-            } else {
-                for (Genre genre : topGenres) {
-                    System.out.println("- " + genre.getName());
-                }
+        if (currentListener == null) {
+            System.out.println("Please log in as a listener before proceeding.");
+            currentListener = listenerLogin();
+            if (currentListener == null) {
+                return;
             }
+        }
+        List<Genre> topGenres = musicController.getTopGenresForListener(currentListener);
+        System.out.println("Top Genres for " + currentListener.getName() + ":");
+        if (topGenres.isEmpty()) {
+            System.out.println("No genres found.");
         } else {
-            System.out.println("Listener not found.");
+            for (Genre genre : topGenres) {
+                System.out.println("- " + genre.getName());
+            }
         }
     }
     /**18Adds a song to the listener's listening history.
-     * Prompts the user for their username and the song they want to add to their history.
+     * Prompts the song they want to add to their history.
      * If the song exists, it will be added to the listener's history.*/
     private void addSongToHistory() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter your username:");
-        String listenerName = scanner.nextLine();
-
-        Listener listener = musicController.getListenerByName(listenerName);
-        if (listener == null) {
-            System.out.println("Listener not found.");
-            return;
+        if (currentListener == null) {
+            System.out.println("Please log in as a listener first.");
+            currentListener = listenerLogin();
+            if (currentListener == null) {
+                System.out.println("Listener login failed.");
+                return;
+            }
         }
-        System.out.println("Enter the title of the song you want to add to " + listenerName + "'s history:");
+        System.out.println("Enter the title of the song you want to add to " + currentListener.getName() + "'s history:");
         String songTitle = scanner.nextLine();
-
         Song song = musicController.getSongByTitle(songTitle);
         if (song != null) {
-            musicController.addSongToHistory(listenerName, songTitle);
+            musicController.addSongToHistory(currentListener.getName(), songTitle);
+            System.out.println("Song " + songTitle + " has been added to " + currentListener.getName() + "'s history.");
         } else {
             System.out.println("Song not found.");
         }
     }
     /**19Retrieves and displays the listening history of a specific listener.
-     * Prompts the user for their username and fetches the list of songs that the listener has previously listened to.
+     * fetches the list of songs that the listener has previously listened to.
      * Displays the songs in the listener's history.*/
     private void getHistory() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter your username:");
-        String listenerName = scanner.nextLine();
+        if (currentListener == null) {
+            System.out.println("Please log in as a listener first.");
+            currentListener = listenerLogin();
+            if (currentListener == null) {
+                System.out.println("Listener login failed.");
+                return;
+            }
+        }
+        String listenerName = currentListener.getName();
         List<Song> songs = musicController.getHistory(listenerName);
         if (songs != null && !songs.isEmpty()) {
             System.out.println("History for " + listenerName + ":");
@@ -680,27 +699,23 @@ public class MusicKonsole {
         }
     }
     /**25* Displays the VIP score for a listener at a specific concert.
-     * Prompts the user for their name and the concert ID, retrieves the listener
+     * Prompts the concert ID, retrieves the listener
      * and concert details, and calculates the VIP score.*/
-    public void showVIPScore() {
-        Scanner scanner = new Scanner(System.in);
-        try {
-            System.out.print("Enter your name: ");
-            String listenerName = scanner.nextLine();
-            Listener listener = musicController.getListenerByName(listenerName);
-            if (listener == null) {
-                System.out.println("Listener not found.");
+    private void showVIPScore() {
+        if (currentListener == null) {
+            System.out.println("Please log in as a listener first.");
+            currentListener = listenerLogin();
+            if (currentListener == null) {
+                System.out.println("Listener login failed.");
                 return;
             }
-            System.out.print("Enter the concert ID: ");
-            int concertId = scanner.nextInt();
-            double vipScore = musicController.getConcertVIPScore(listener, concertId);
-            System.out.println("The VIP score for the concert is: " + vipScore);
-        } catch (IllegalArgumentException ex) {
-            System.out.println("Error: " + ex.getMessage());
-        } catch (Exception ex) {
-            System.out.println("An unexpected error occurred: " + ex.getMessage());
         }
+        String listenerName = currentListener.getName();
+        System.out.println("Logged in as " + listenerName);
+        System.out.print("Enter the concert ID: ");
+        int concertId = scanner.nextInt();
+        double vipScore = musicController.getConcertVIPScore(currentListener, concertId);
+        System.out.println("The VIP score for the concert is: " + vipScore);
     }
     // ----------------- ARTIST MENU  METHODS -----------------
     /**1* Prompts the user to enter details to create a new album. It asks for the album title,
@@ -857,14 +872,26 @@ public class MusicKonsole {
     /***9 Prompts the user to enter the name of an artist and displays the list of listeners who follow that artist.
      * If the artist is found, it lists their followers; otherwise, an error message is shown.*/
     private void viewFollowers() {
-        System.out.println("Enter artist name:");
+        //if (currentArtist == null) {
+        //    System.out.println("Please log in as an artist first.");
+         //   currentArtist = artistLogin();
+         //   if (currentArtist == null) {
+         //       System.out.println("Artist login failed.");
+          //      return;
+          //  }
+        //}
+        System.out.println("Enter artist name to view followers:");
         String artistName = scanner.nextLine();
         Artist artist = musicController.getArtistByName(artistName);
         if (artist != null) {
             List<Listener> followers = artist.getFollowers();
             System.out.println("Followers of " + artist.getName() + ":");
-            for (Listener follower : followers) {
-                System.out.println("- " + follower.getName());
+            if (followers.isEmpty()) {
+                System.out.println("No followers found for this artist.");
+            } else {
+                for (Listener follower : followers) {
+                    System.out.println("- " + follower.getName());
+                }
             }
         } else {
             System.out.println("Artist not found.");
@@ -876,5 +903,75 @@ public class MusicKonsole {
         System.out.println("Enter the title of the concert to view attendees:");
         String concertTitle = scanner.nextLine();
         musicController.showAttendees(concertTitle);
+    }
+    /**11* Filters albums by genre for a specific artist.*/
+    private void filterAlbumsByGenre() {
+        System.out.println("Enter artist ID:");
+        int artistId = scanner.nextInt();
+        scanner.nextLine();
+        System.out.println("Enter genre name:");
+        String genreName = scanner.nextLine();
+        List<Album> albums = musicController.filterAlbumsByGenre(artistId, genreName);
+        if (albums.isEmpty()) {
+            System.out.println("No albums found for the specified genre.");
+        } else {
+            System.out.println("Albums found for the specified genre:");
+            albums.forEach(album -> System.out.println(album.getTitle()));
+        }
+    }
+    /**12* Filters songs by minimum duration for a specific artist.*/
+    private  void filterSongsByDuration() {
+        System.out.println("Enter artist ID:");
+        int artistId = scanner.nextInt();
+        System.out.println("Enter minimum duration in seconds:");
+        float minDuration = scanner.nextFloat();
+        List<Song> songs = musicController.filterSongsByMinimumDuration(artistId, minDuration);
+        if (songs.isEmpty()) {
+            System.out.println("No songs found with the specified duration.");
+        } else {
+            System.out.println("Songs found with the specified duration:");
+            songs.forEach(song -> System.out.println(song.getTitle()));
+        }
+    }
+    /**13* Prompts the user for an artist ID, retrieves and sorts the artist's albums by release date, then displays the album titles.
+     * If no albums are found, a message is displayed. Otherwise, the album titles are printed in order from the earliest to the most recent.*/
+    private void sortAlbumsByReleaseDate(){
+        System.out.println("Enter artist ID:");
+        int artistId=scanner.nextInt();
+        System.out.println("Sorting albums by release date:");
+        List<Album> albums=musicController.sortAlbumsByReleaseDate(artistId);
+        if (albums.isEmpty()) {
+            System.out.println("No albums found.");
+        } else {
+            albums.forEach(song -> System.out.println(song.getTitle()));
+        }
+    }
+    /**14* Prompts the user to enter an album ID and then sorts and displays the songs of that album by their title.
+     * This method calls the `sortSongsByTitle()` method in the `musicController` to retrieve a list of songs
+     * from the specified album, sorted by their title.*/
+    private void sortSongsByTitle(){
+        System.out.println("Enter album ID:");
+        int albumId=scanner.nextInt();
+        System.out.println("Sorting songs by title:");
+        List<Song> songs=musicController.sortSongsByTitle(albumId);
+        if (songs.isEmpty()) {
+            System.out.println("No songs found.");
+        } else {
+            songs.forEach(song -> System.out.println(song.getTitle()));
+        }
+    }
+    /**15* Displays a list of artists sorted by the total number of songs and albums they have.
+     * This method retrieves the artists from the `musicController` and calculates the
+     * total number of songs and albums for each artist.*/
+    private void displayArtistsWithMostSongsAndAlbums() {
+        List<Artist> artists = musicController.getArtistsWithMostSongsAndAlbums();
+        System.out.println("Artists sorted by total number of songs and albums:");
+        for (Artist artist : artists) {
+            int totalSongs = artist.getAlbums().stream()
+                    .mapToInt(album -> album.getSongs().size())
+                    .sum();
+            int totalAlbums = artist.getAlbums().size();
+            System.out.println(artist.getName() + " - Total Songs: " + totalSongs + " - Total Albums: " + totalAlbums);
+        }
     }
 }

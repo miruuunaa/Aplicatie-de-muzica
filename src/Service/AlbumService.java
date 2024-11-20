@@ -1,9 +1,12 @@
 package Service;
 import Domain.Album;
+import Domain.Artist;
 import Domain.Song;
 import Repository.IRepository;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The AlbumService class provides various methods to manage albums within the music system.
@@ -95,6 +98,21 @@ public class AlbumService {
         }
         return null;
     }
+
+    /**
+     * Sort songs of an album by the title
+     *
+     * @param albumId id of the album
+     * @return list of songs sorted by the title
+     */
+    public List<Song> sortSongsByTitle(int albumId) {
+        Album album = albumRepository.get(albumId);
+        return album.getSongs().stream()
+                .sorted(Comparator.comparing(Song::getTitle))
+                .collect(Collectors.toList());
+    }
+
+
 
 
 }

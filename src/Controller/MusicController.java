@@ -102,8 +102,44 @@ public class MusicController {
         artistService.showDiscography(artistName);
     }
 
+    /**
+     * Filters albums by genre for a specific artist.
+     *
+     * @param artistId The ID of the artist.
+     * @param genreName The genre name to filter albums by.
+     * @return List of albums matching the genre.
+     */
+    public List<Album> filterAlbumsByGenre(int artistId, String genreName) {
+        return artistService.filterAlbumsByGenre(artistId, genreName);
+    }
 
+    /**
+     * Filters songs by minimum duration for a specific artist.
+     *
+     * @param artistId The ID of the artist.
+     * @param minDuration Minimum duration of the songs to be returned.
+     * @return List of songs with duration greater than or equal to minDurationInSeconds.
+     */
+    public List<Song> filterSongsByMinimumDuration(int artistId, float minDuration) {
+        return artistService.filterSongsByMinimumDuration(artistId, minDuration);
+    }
 
+    /**
+     *
+     * @param artistId
+     * @return
+     */
+    public List<Album> sortAlbumsByReleaseDate(int artistId) {
+        return artistService.sortAlbumsByReleaseDate(artistId);
+    }
+    /**
+     * Gets a sorted list of artists based on the number of songs and albums.
+     *
+     * @return A list of sorted artists.
+     */
+    public List<Artist> getArtistsWithMostSongsAndAlbums() {
+        return artistService.getArtistsWithMostSongsAndAlbums();
+    }
     // ----------------- ALBUM METHODS -----------------
 
     /**
@@ -176,6 +212,15 @@ public class MusicController {
      */
     public Album getAlbumByName(String albumName){
         return albumService.getAlbumByName(albumName);
+    }
+
+    /**
+     *
+     * @param albumId
+     * @return
+     */
+    public List<Song> sortSongsByTitle(int albumId) {
+        return albumService.sortSongsByTitle(albumId);
     }
 
     // ----------------- SONG METHODS -----------------
@@ -486,7 +531,6 @@ public class MusicController {
 
         if (listener != null && song != null) {
             listener.getHistory().addSongToHistory(song);
-            System.out.println(song.getTitle() + " added to history for " + listener.getName());
         } else {
             System.out.println("Listener or Song not found.");
         }

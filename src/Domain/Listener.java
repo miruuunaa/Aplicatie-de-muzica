@@ -99,7 +99,7 @@ public class Listener extends User {
         return subscription != null && "Premium".equalsIgnoreCase(subscription.getType());
     }
     /**
-     * Provides a string representation of the listener, including name, email, and the count of history items.
+     * Provides a string representation of the listener, including name, email.
      *
      * @return A string describing the listener
      */
