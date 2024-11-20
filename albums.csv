@@ -1,0 +1,57 @@
+1,Abbey Road,Genre{name='Rock', songs=[]}
+2,Lemonade,Genre{name='Pop', songs=[]}
+3,25,Genre{name='Pop', songs=[]}
+4,Divide,Genre{name='Pop', songs=[]}
+5,Master of Puppets,Genre{name='Rock', songs=[]}
+6,1989,Genre{name='Pop', songs=[]}
+7,Scorpion,Genre{name='Hip Hop', songs=[]}
+8,Thank U, Next,Genre{name='Pop', songs=[]}
+9,When We All Fall Asleep, Where Do We Go?,Genre{name='Pop', songs=[]}
+10,Uptown Special,Genre{name='Pop', songs=[]}
+11,Justice,Genre{name='Pop', songs=[]}
+12,After Hours,Genre{name='Pop', songs=[]}
+13,A Star is Born,Genre{name='Pop', songs=[]}
+14,DAMN.,Genre{name='Hip Hop', songs=[]}
+15,Hollywood's Bleeding,Genre{name='Pop', songs=[]}
+16,Single,Genre{name='Rap', songs=[]}
+17,Shawn Mendes,Genre{name='Pop', songs=[]}
+18,Future Nostalgia,Genre{name='Electronic', songs=[]}
+19,Fine Line,Genre{name='Pop', songs=[]}
+20,8 Mile Soundtrack,Genre{name='Rap', songs=[]}
+21,Dangerously in Love,Genre{name='Pop', songs=[]}
+22,B'Day,Genre{name='Pop', songs=[]}
+23,I Am Sasha Fierce,Genre{name='Rock', songs=[]}
+24,4,Genre{name='Rock', songs=[]}
+25,BEYONCE,Genre{name='Rock', songs=[]}
+26,Renaissance,Genre{name='Electronic', songs=[]}
+27,19,Genre{name='Electronic', songs=[]}
+28,21,Genre{name='Pop', songs=[]}
+29,25,Genre{name='Pop', songs=[]}
+30,30,Genre{name='Pop', songs=[]}
+31,Please Please Me,Genre{name='Rock', songs=[]}
+32,A Hard Day's Night,Genre{name='Rock', songs=[]}
+33,Rubber Soul,Genre{name='Pop', songs=[]}
+34,Revolver,Genre{name='Electronic', songs=[]}
+35,Pepper's Lonely Hearts Club Band ,Genre{name='Electronic', songs=[]}
+36,The White Album,Genre{name='Pop', songs=[]}
+37,Let It Be,Genre{name='Rock', songs=[]}
+38,Thank Me Later,Genre{name='Pop', songs=[]}
+39,Take Care,Genre{name='Pop', songs=[]}
+40,Nothing Was the Same,Genre{name='Rock', songs=[]}
+41,Certified Lover Boy,Genre{name='Electronic', songs=[]}
+42,Her Loss,Genre{name='Electronic', songs=[]}
+43,The Slim Shady LP,Genre{name='Pop', songs=[]}
+44,The Marshall Mathers LP,Genre{name='Pop', songs=[]}
+45,The Eminem Show,Genre{name='Rock', songs=[]}
+46,Encore,Genre{name='Rock', songs=[]}
+47,Relapse,Genre{name='Electronic', songs=[]}
+48,Recovery,Genre{name='Electronic', songs=[]}
+49,The Marshall Mathers LP 2,Genre{name='Electronic', songs=[]}
+50,Revival,Genre{name='Pop', songs=[]}
+51,Kamikaze,Genre{name='Rock', songs=[]}
+52,Music to Be Murdered By,Genre{name='Pop', songs=[]}
+53,Plus,Genre{name='Electronic', songs=[]}
+54,Multiply,Genre{name='Electronic', songs=[]}
+55,Divide,Genre{name='Rock', songs=[]}
+56,No.6 Collaborations Project,Genre{name='Rock', songs=[]}
+57,Equals,Genre{name='Pop', songs=[]}
