@@ -18,22 +18,22 @@ import Service.*;
 public class MusicApp {
     public static void main(String[] args) {
         //Repo-inmemory
-        IRepository<Artist> artistRepository = createInMemoryArtistRepository();
-        IRepository<Album> albumRepository =  createInMemoryAlbumRepository(artistRepository);
-        IRepository<Song> songRepository = createInMemorySongRepository(albumRepository);
-        IRepository<LiveConcert> concertRepository = createInMemoryLiveConcertRepository(artistRepository);
-        IRepository<Playlist> playlistRepository = new InMemoryRepository<>();
-        IRepository<Listener> listenerRepository = createInMemoryListenerRepository();
-        IRepository<Subscription> subscriptionRepository = createInMemorySubscriptionRepository(listenerRepository);
+        //IRepository<Artist> artistRepository = createInMemoryArtistRepository();
+        //IRepository<Album> albumRepository =  createInMemoryAlbumRepository(artistRepository);
+        //IRepository<Song> songRepository = createInMemorySongRepository(albumRepository);
+        //IRepository<LiveConcert> concertRepository = createInMemoryLiveConcertRepository(artistRepository);
+        //IRepository<Playlist> playlistRepository = new InMemoryRepository<>();
+        //IRepository<Listener> listenerRepository = createInMemoryListenerRepository();
+        //IRepository<Subscription> subscriptionRepository = createInMemorySubscriptionRepository(listenerRepository);
 
         //Repo-file
-        //IRepository<Artist> artistRepository = createFileBasedArtistRepository();
-        //IRepository<Album> albumRepository = createFileBasedAlbumRepository(artistRepository);
-        //IRepository<Song> songRepository = createFileBasedSongRepository(albumRepository);
-        //IRepository<Listener> listenerRepository = createFileBasedListenerRepository();
-        //IRepository<LiveConcert> concertRepository = createFileBasedLiveConcertRepository(artistRepository);
-        //IRepository<Playlist> playlistRepository=new FileRepository<>("playlist.csv");
-        //IRepository<Subscription> subscriptionRepository = createFileBasedSubscriptionRepository(listenerRepository);
+        IRepository<Artist> artistRepository = createFileBasedArtistRepository();
+        IRepository<Album> albumRepository = createFileBasedAlbumRepository(artistRepository);
+        IRepository<Song> songRepository = createFileBasedSongRepository(albumRepository);
+        IRepository<Listener> listenerRepository = createFileBasedListenerRepository();
+        IRepository<LiveConcert> concertRepository = createFileBasedLiveConcertRepository(artistRepository);
+        IRepository<Playlist> playlistRepository=new FileRepository<>("playlist.csv");
+        IRepository<Subscription> subscriptionRepository = createFileBasedSubscriptionRepository(listenerRepository);
 
 
         //Service
