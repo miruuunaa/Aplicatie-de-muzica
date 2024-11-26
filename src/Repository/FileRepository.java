@@ -6,6 +6,7 @@ import Domain.Song;
 import Domain.Listener;
 import Domain.Subscription;
 import Domain.LiveConcert;
+import Domain.Playlist;
 
 import java.io.*;
 import java.text.ParseException;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class FileRepository<T> implements IRepository<T> {
     private final String filePath;
@@ -176,6 +178,41 @@ public class FileRepository<T> implements IRepository<T> {
                             liveConcert.setId(id);
                             data.put(id, (T) liveConcert);
                         }
+                        else if (filePath.contains("playlists.csv")) {
+                            String playlistName = dataFields[1];
+                            List<Song> songs = new ArrayList<>();
+                            if (dataFields.length > 2 && !dataFields[2].isEmpty()) {
+                                String[] songIds = dataFields[2].split(";");
+                                for (String songIdStr : songIds) {
+                                    try {
+                                        int songId = Integer.parseInt(songIdStr.trim());
+                                        Song song = findSongById(songId);
+                                        if (song != null) {
+                                            songs.add(song);
+                                        }
+                                    } catch (NumberFormatException e) {
+                                        System.out.println("Invalid song ID in playlist: " + songIdStr);
+                                    }
+                                }
+                            }
+                            Listener listener = null;
+                            if (dataFields.length > 3) {
+                                try {
+                                    int listenerId = Integer.parseInt(dataFields[3].trim());
+                                    listener = findListenerById(listenerId);
+                                } catch (NumberFormatException e) {
+                                    System.out.println("Invalid Listener ID in playlist: " + dataFields[3]);
+                                }
+                            }
+                            if (listener == null) {
+                                listener = new Listener("Default Listener", "default@example.com");
+                            }
+                            Playlist playlist = new Playlist(playlistName, listener);
+                            playlist.setSongs(songs);
+                            playlist.setId(id);
+                            data.put(id, (T) playlist);
+                        }
+
                     }
 
                     if (id >= currentId) {
@@ -210,8 +247,15 @@ public class FileRepository<T> implements IRepository<T> {
                 } else if (obj instanceof LiveConcert) {
                     LiveConcert liveConcert = (LiveConcert) obj;
                     writer.write(liveConcert.getId() + "," + liveConcert.getTitle() + "," + liveConcert.getDate() + "\n");
+                } else if (obj instanceof Playlist) {
+                    Playlist playlist = (Playlist) obj;
+                    String songIds = playlist.getSongs().stream()
+                            .map(song -> String.valueOf(song.getId()))
+                            .collect(Collectors.joining(";"));
+                    writer.write(playlist.getId() + "," + playlist.getName() + "," + songIds + "\n");
                 }
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -252,4 +296,17 @@ public class FileRepository<T> implements IRepository<T> {
         }
         return null;
     }
+
+    private Song findSongById(int songId) {
+        for (T obj : data.values()) {
+            if (obj instanceof Song) {
+                Song song = (Song) obj;
+                if (song.getId() == songId) {
+                    return song;
+                }
+            }
+        }
+        return null;
+    }
+
 }
