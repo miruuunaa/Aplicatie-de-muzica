@@ -107,6 +107,9 @@ public class AlbumService {
      */
     public List<Song> sortSongsByTitle(int albumId) {
         Album album = albumRepository.get(albumId);
+        if (album == null) {
+            throw new IllegalArgumentException("Album not found.");
+        }
         return album.getSongs().stream()
                 .sorted(Comparator.comparing(Song::getTitle))
                 .collect(Collectors.toList());

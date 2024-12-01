@@ -140,6 +140,9 @@ public class ArtistService {
      */
     public List<Album> sortAlbumsByReleaseDate(int artistId) {
         Artist artist = artistRepository.get(artistId);
+        if (artist == null) {
+            throw new IllegalArgumentException("Artist not found.");
+        }
         return artist.getAlbums().stream()
                 .sorted(Comparator.comparing(Album::getReleaseDate))
                 .collect(Collectors.toList());

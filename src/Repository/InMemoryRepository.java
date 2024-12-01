@@ -51,9 +51,9 @@ public class InMemoryRepository<T> implements IRepository<T> {
      */
     @Override
     public T read(int id) {
-        if (!data.containsKey(id)) {
-            throw new IllegalArgumentException("Entity with id " + id + " does not exist.");
-        }
+        //if (!data.containsKey(id)) {
+         //   throw new IllegalArgumentException("Entity with id " + id + " does not exist.");
+        //}
         return data.get(id);
     }
     /**
@@ -95,7 +95,7 @@ public class InMemoryRepository<T> implements IRepository<T> {
             data.remove(id);
             System.out.println("Entity with ID " + id + " has been deleted.");
         } else {
-            System.out.println("Entity with ID " + id + " does not exist.");
+            throw new IllegalArgumentException("Cannot delete: Entity with id " + id + " does not exist.");
         }
     }
 

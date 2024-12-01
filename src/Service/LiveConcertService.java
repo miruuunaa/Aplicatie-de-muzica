@@ -1,9 +1,11 @@
 package Service;
+import Domain.Artist;
 import Domain.LiveConcert;
 import Domain.Listener;
 import Repository.IRepository;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -209,6 +211,10 @@ public class LiveConcertService {
         }
 
         return score;
+    }
+
+    public void addConcert(LiveConcert concert){
+        concertRepository.create(concert);
     }
 
 }
