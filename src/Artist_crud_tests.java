@@ -18,20 +18,20 @@ public class Artist_crud_tests {
     @Test
     public void testCRUDOperationsForArtist() {
         // Create
-        Artist artist = new Artist("Test Artist", "test@example.com");
+        Artist artist = new Artist("Three Days Grace", "threedays@gracemusic.com");
         artistRepository.create(artist);
         Artist createdArtist = artistRepository.read(artist.getId());
         assertNotNull(createdArtist, "Created artist should not be null.");
-        assertEquals("Test Artist", createdArtist.getName(), "Artist name should match.");
-        assertEquals("test@example.com", createdArtist.getEmail(), "Artist email should match.");
+        assertEquals("Three Days Grace", createdArtist.getName(), "Artist name should match.");
+        assertEquals("threedays@gracemusic.com", createdArtist.getEmail(), "Artist email should match.");
 
         // Update
-        createdArtist.setName("Updated Artist");
-        createdArtist.setEmail("updated@example.com");
+        createdArtist.setName("Three Days Grace 2X");
+        createdArtist.setEmail("threedays@grace2Xmusic.com");
         artistRepository.update(createdArtist);
         Artist updatedArtist = artistRepository.read(createdArtist.getId());
-        assertEquals("Updated Artist", updatedArtist.getName(), "Updated artist name should match.");
-        assertEquals("updated@example.com", updatedArtist.getEmail(), "Updated artist email should match.");
+        assertEquals("Three Days Grace 2X", updatedArtist.getName(), "Updated artist name should match.");
+        assertEquals("threedays@grace2Xmusic.com", updatedArtist.getEmail(), "Updated artist email should match.");
 
         // Delete
         artistRepository.delete(updatedArtist.getId());
