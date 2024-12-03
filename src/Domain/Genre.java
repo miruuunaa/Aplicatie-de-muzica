@@ -6,6 +6,7 @@ import java.util.List;
  * Each genre has a name and a list of songs that belong to it.
  */
 public class Genre {
+    int id;
     private String name;
     private List<Song> songs;
 
@@ -50,6 +51,15 @@ public class Genre {
     public void addSong(Song song) {
         songs.add(song);
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     /**
      * Returns a string representation of the genre,
      * showing its name and associated songs.

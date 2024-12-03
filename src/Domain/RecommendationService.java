@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
  * It uses the user's listening history to determine the most frequently listened genres and artists.
  */
 public class RecommendationService {
+    int id;
     private final History userHistory;
     private List<Song> allSongs;
 
@@ -123,5 +124,13 @@ public class RecommendationService {
                 "userHistory=" + userHistory +
                 ", allSongs=" + allSongs +
                 '}';
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
     }
 }

@@ -8,6 +8,7 @@ import java.util.*;
  * retrieve the list of songs along with their playback timestamps.
  */
 public class History {
+    int id;
     private Listener user;
     private List<Song> songs;
     private Map<Song, LocalDateTime> songHistory;
@@ -48,6 +49,11 @@ public class History {
     public Map<Song, LocalDateTime> getSongHistory() {
         return songHistory;
     }
+
+    public void setSongHistory(Map<Song, LocalDateTime> songHistory) {
+        this.songHistory = songHistory;
+    }
+
     /**
      * Retrieves the listener associated with this history.
      *
@@ -65,4 +71,11 @@ public class History {
         return songHistory.size();
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }

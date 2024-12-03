@@ -109,4 +109,8 @@ public class Listener extends User {
                 "name='" + getName() + '\'' +
                 ", email='" + getEmail() + '\'' + '}';
     }
+
+    public void setHistory(History history) {
+        this.history = history;
+    }
 }
