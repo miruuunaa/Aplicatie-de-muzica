@@ -4,8 +4,11 @@ import Domain.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+
 /**The MusicKonsole class represents the console interface for the MTIFY Music application.
  * It interacts with the user to allow listeners and artists to manage their accounts, playlists, and concerts.
  * It provides a menu-driven system for navigation between different functionalities.*/
@@ -732,8 +735,23 @@ public class MusicKonsole {
             String artistName = scanner.nextLine();
             Artist artist = musicController.getArtistByName(artistName);
             if (artist != null) {
-                Album album = new Album(albumTitle, releaseDate, artist);
-                musicController.addAlbum(album);
+                System.out.println("Available genres:");
+                List<Genre> genres = musicController.getAllGenres();
+                for (int i = 0; i < genres.size(); i++) {
+                    System.out.println((i + 1) + ". " + genres.get(i).getName());
+                }
+                System.out.println("Select a genre by number:");
+                int genreChoice = scanner.nextInt();
+                scanner.nextLine();
+                if (genreChoice > 0 && genreChoice <= genres.size()) {
+                    Genre selectedGenre = genres.get(genreChoice - 1);
+                    Album album = new Album(albumTitle, releaseDate, artist);
+                    album.setGenre(selectedGenre);
+                    musicController.addAlbum(album);
+                    System.out.println("Album '" + albumTitle + "' added to artist " + artist.getName());
+                } else {
+                    System.out.println("Invalid genre selection.");
+                }
             } else {
                 System.out.println("Artist not found.");
             }
@@ -761,11 +779,35 @@ public class MusicKonsole {
             if (album == null) {
                 System.out.println("Album not found. Proceeding without an album.");
             }
-            Song song = new Song(songTitle, duration, album);
-            musicController.addSong(song);
-            System.out.println("Song " + songTitle + " uploaded successfully.");
-        } else {
-            System.out.println("Artist not found.");
+            if (album != null) {
+                Genre albumGenre = album.getGenre();
+                if (albumGenre != null) {
+                    Song song = new Song(songTitle, duration, album);
+                    song.setGenre(albumGenre);
+                    musicController.addSong(song);
+                    System.out.println("Song '" + songTitle + "' added to album '" + album.getTitle() + "' with genre '" + albumGenre.getName() + "'.");
+                } else {
+                    System.out.println("Album does not have a genre. Please select a genre for this song.");
+                    List<Genre> genres = musicController.getAllGenres();
+                    for (int i = 0; i < genres.size(); i++) {
+                        System.out.println((i + 1) + ". " + genres.get(i).getName());
+                    }
+                    System.out.println("Select a genre by number:");
+                    int genreChoice = scanner.nextInt();
+                    scanner.nextLine();
+                    if (genreChoice > 0 && genreChoice <= genres.size()) {
+                        Genre selectedGenre = genres.get(genreChoice - 1);
+                        Song song = new Song(songTitle, duration, album);
+                        song.setGenre(selectedGenre);
+                        musicController.addSong(song);
+                        System.out.println("Song '" + songTitle + "' added to album '" + album.getTitle() + "' with genre '" + selectedGenre.getName() + "'.");
+                    } else {
+                        System.out.println("Invalid genre selection.");
+                    }
+                }
+            } else {
+                System.out.println("Album not found.");
+            }
         }
     }
     /**3* Prompts the user to start a concert by entering the concert title. It checks for concert details
@@ -809,9 +851,13 @@ public class MusicKonsole {
     /**5* Lists all available albums in the system. Displays each album's title.*/
     private void listAvailableAlbums() {
         List<Album> albums = musicController.getAvailableAlbums();
+        Set<String> seenAlbums = new HashSet<>();
         System.out.println("Available albums:");
         for (Album album : albums) {
-            System.out.println("- " + album.getTitle());
+            if (!seenAlbums.contains(album.getTitle())) {
+                System.out.println("- " + album.getTitle());
+                seenAlbums.add(album.getTitle());
+            }
         }
     }
     /**6* Prompts the user to enter the title of an album and retrieves a list of songs in that album.

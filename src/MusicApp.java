@@ -5,9 +5,7 @@ import java.util.List;
 import Controller.MusicController;
 import Domain.*;
 import Konsole.MusicKonsole;
-import Repository.FileRepository;
-import Repository.IRepository;
-import Repository.InMemoryRepository;
+import Repository.*;
 import Service.*;
 
 
@@ -27,13 +25,27 @@ public class MusicApp {
         //IRepository<Subscription> subscriptionRepository = createInMemorySubscriptionRepository(listenerRepository);
 
         //Repo-file
-        IRepository<Artist> artistRepository = createFileBasedArtistRepository();
-        IRepository<Album> albumRepository = createFileBasedAlbumRepository(artistRepository);
-        IRepository<Song> songRepository = createFileBasedSongRepository(albumRepository);
-        IRepository<Listener> listenerRepository = createFileBasedListenerRepository();
-        IRepository<LiveConcert> concertRepository = createFileBasedLiveConcertRepository(artistRepository);
-        IRepository<Playlist> playlistRepository=new FileRepository<>("playlist.csv");
-        IRepository<Subscription> subscriptionRepository = createFileBasedSubscriptionRepository(listenerRepository);
+        //IRepository<Artist> artistRepository = createFileBasedArtistRepository();
+        //IRepository<Album> albumRepository = createFileBasedAlbumRepository(artistRepository);
+        //IRepository<Song> songRepository = createFileBasedSongRepository(albumRepository);
+        //IRepository<Listener> listenerRepository = createFileBasedListenerRepository();
+        //IRepository<LiveConcert> concertRepository = createFileBasedLiveConcertRepository(artistRepository);
+        //IRepository<Playlist> playlistRepository=new FileRepository<>("playlist.csv");
+        //IRepository<Subscription> subscriptionRepository = createFileBasedSubscriptionRepository(listenerRepository);
+
+        //Repo-DB
+        String url = "jdbc:postgresql://localhost:5432/MTifyDatabase";
+        String user ="postgres";
+        String password = "1111";
+        ArtistDBRepository artistRepository=new ArtistDBRepository(url,user,password);
+        AlbumDBRepository albumRepository=new AlbumDBRepository(url,user,password);
+        SongDBRepository songRepository=new SongDBRepository(url,user,password);
+        LiveConcertDBRepository concertRepository=new LiveConcertDBRepository(url,user,password);
+        PlaylistDBRepository playlistRepository=new PlaylistDBRepository(url,user,password);
+        ListenerDBRepository listenerRepository=new ListenerDBRepository(url,user,password);
+        SubscriptionDBRepository subscriptionRepository=new SubscriptionDBRepository(url,user,password);
+        HistoryDBRepository historyDBRepository=new HistoryDBRepository(url,user,password);
+        GenreDBRepository genreDBRepository=new GenreDBRepository(url,user,password);
 
 
         //Service
@@ -44,6 +56,7 @@ public class MusicApp {
         PlaylistService playlistService=new PlaylistService(playlistRepository);
         ListenerService listenerService=new ListenerService(listenerRepository,subscriptionRepository);
         SubscriptionService subscriptionService=new SubscriptionService(subscriptionRepository);
+        GenreService genreService=new GenreService(genreDBRepository);
 
         Listener listener = listenerRepository.get(0);
         History userHistory = new History(listener);
@@ -54,7 +67,7 @@ public class MusicApp {
 
         //Controller
         MusicController musicController=new MusicController(artistService,albumService,songService,playlistService,listenerService,
-                liveConcertService,recommendationService,subscriptionService);
+                liveConcertService,recommendationService,subscriptionService,genreService);
         //Konsole
         MusicKonsole musicKonsole=new MusicKonsole(musicController);
         musicKonsole.showMainMenu();

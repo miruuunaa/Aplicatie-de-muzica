@@ -52,6 +52,10 @@ public class Album {
         return songs;
     }
 
+    public void setSongs(List<Song> songs) {
+        this.songs = songs;
+    }
+
     /**
      * Gets the artist associated with the album.
      *
@@ -87,8 +91,7 @@ public class Album {
     public void addSong(Song song) {
         if (!songs.contains(song)) {
             songs.add(song);
-        } else {
-            System.out.println("Song " + song.getTitle() + " is already in album " + title + ".");
+            System.out.println("Song '" + song.getTitle() + "' added to album '" + this.getTitle() + "'");
         }
     }
     /**

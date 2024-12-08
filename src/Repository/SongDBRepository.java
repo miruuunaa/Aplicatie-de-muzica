@@ -4,43 +4,31 @@ import Domain.Song;
 import Domain.Album;
 import Domain.Genre;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.time.LocalDate;
 
+/**
+ * Repository for Song
+ */
 public class SongDBRepository extends DBRepository<Song> {
-
-    private int currentId;
-
+    private AlbumDBRepository albumDBRepository;
     public SongDBRepository(String DBUrl, String DBUser, String DBPassword) {
         super(DBUrl, DBUser, DBPassword);
-        this.currentId = getMaxIdFromDatabase() + 1;
+        this.albumDBRepository = new AlbumDBRepository(DBUrl, DBUser, DBPassword);
+
+
     }
-
-
-    private int getMaxIdFromDatabase() {
-        String SQL = "SELECT MAX(ID) AS maxId FROM songs";
-        try (PreparedStatement statement = connection.prepareStatement(SQL);
-             ResultSet rs = statement.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt("maxId");
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error reading max ID", e);
-        }
-        return 0;
-    }
-
     @Override
     public void create(Song obj) {
-        String SQL = "INSERT INTO songs (ID, title, duration, album_id, genre_id) VALUES (?, ?, ?, ?, ?)";
+        String SQL = "INSERT INTO Song (title, duration, album_id, genre_id) VALUES (?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(SQL)) {
-            obj.setId(currentId);
-            statement.setInt(1, currentId++);
-            statement.setString(2, obj.getTitle());
-            statement.setFloat(3, obj.getDuration());
-            statement.setInt(4, obj.getAlbum().getId());
-            statement.setInt(5, obj.getGenre().getId());
+            statement.setString(1, obj.getTitle());
+            statement.setFloat(2, obj.getDuration());
+            statement.setInt(3, obj.getAlbum().getId());
+            statement.setInt(4, obj.getGenre().getId());
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error adding Song", e);
@@ -49,7 +37,7 @@ public class SongDBRepository extends DBRepository<Song> {
 
     @Override
     public Song read(int id) {
-        String SQL = "SELECT * FROM songs WHERE ID = ?";
+        String SQL = "SELECT * FROM Song WHERE id = ?";
         Song song = null;
         try (PreparedStatement statement = connection.prepareStatement(SQL)) {
             statement.setInt(1, id);
@@ -66,23 +54,12 @@ public class SongDBRepository extends DBRepository<Song> {
 
     @Override
     public Song get(int id) {
-        String SQL = "SELECT * FROM songs WHERE ID = ?";
-        try (PreparedStatement statement = connection.prepareStatement(SQL)) {
-            statement.setInt(1, id);
-            try (ResultSet rs = statement.executeQuery()) {
-                if (rs.next()) {
-                    return readFromResultSet(rs);
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error get Song by id", e);
-        }
-        return null;
+        return read(id);
     }
 
     @Override
     public void update(Song obj) {
-        String SQL = "UPDATE songs SET title = ?, duration = ?, album_id = ?, genre_id = ? WHERE ID = ?";
+        String SQL = "UPDATE Song SET title = ?, duration = ?, album_id = ?, genre_id = ? WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(SQL)) {
             statement.setString(1, obj.getTitle());
             statement.setFloat(2, obj.getDuration());
@@ -97,7 +74,7 @@ public class SongDBRepository extends DBRepository<Song> {
 
     @Override
     public void delete(int id) {
-        String SQL = "DELETE FROM songs WHERE ID = ?";
+        String SQL = "DELETE FROM Song WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(SQL)) {
             statement.setInt(1, id);
             statement.executeUpdate();
@@ -108,7 +85,7 @@ public class SongDBRepository extends DBRepository<Song> {
 
     @Override
     public Map<Integer, Song> getAll() {
-        String SQL = "SELECT * FROM songs";
+        String SQL = "SELECT * FROM Song";
         Map<Integer, Song> songMap = new HashMap<>();
         try (PreparedStatement statement = connection.prepareStatement(SQL)) {
             ResultSet resultSet = statement.executeQuery();
@@ -119,7 +96,25 @@ public class SongDBRepository extends DBRepository<Song> {
         } catch (SQLException e) {
             throw new RuntimeException("Error getting all songs", e);
         }
+        System.out.println("Songs retrieved: " + songMap.size());
         return songMap;
+    }
+
+    public List<Song> getSongsForPlaylist(int playlistId) {
+        String SQL = "SELECT s.* FROM Song s " +
+                "JOIN PlaylistSongs ps ON s.ID = ps.song_id " +
+                "WHERE ps.playlist_id = ?";
+        List<Song> songs = new ArrayList<>();
+        try (PreparedStatement statement = connection.prepareStatement(SQL)) {
+            statement.setInt(1, playlistId);
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                songs.add(readFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error reading songs for playlist", e);
+        }
+        return songs;
     }
 
 
@@ -127,71 +122,21 @@ public class SongDBRepository extends DBRepository<Song> {
         String title = rs.getString("title");
         float duration = rs.getFloat("duration");
         int albumId = rs.getInt("album_id");
-        int genreId = rs.getInt("genre_id");
-        Album album = getAlbumById(albumId);
-        Genre genre = getGenreById(genreId);
+        Album album = albumDBRepository.read(albumId);
         Song song = new Song(title, duration, album);
-        song.setId(rs.getInt("ID"));
-        song.setGenre(genre);
+        song.setId(rs.getInt("id"));
         return song;
     }
 
-    private Album getAlbumById(int albumId) {
-        String SQL = "SELECT * FROM albums WHERE ID = ?";
-        try (PreparedStatement statement = connection.prepareStatement(SQL)) {
-            statement.setInt(1, albumId);
-            try (ResultSet rs = statement.executeQuery()) {
-                if (rs.next()) {
-                    String title = rs.getString("title");
-                    LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
-                    int artistId = rs.getInt("artist_id");
-                    Artist artist = getArtistById(artistId);
-                    Album album = new Album(title, releaseDate, artist);
-                    album.setId(rs.getInt("ID"));
-                    return album;
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error getting album by ID", e);
-        }
-        return null;
-    }
-
-    private Artist getArtistById(int artistId) {
-        String SQL = "SELECT * FROM artists WHERE ID = ?";
-        try (PreparedStatement statement = connection.prepareStatement(SQL)) {
-            statement.setInt(1, artistId);
-            try (ResultSet rs = statement.executeQuery()) {
-                if (rs.next()) {
-                    String name = rs.getString("name");
-                    String email = rs.getString("email");
-                    Artist artist = new Artist(name, email);
-                    artist.setId(rs.getInt("ID"));
-                    return artist;
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error getting artist by ID", e);
-        }
-        return null;
-    }
 
 
-    private Genre getGenreById(int genreId) {
-        String SQL = "SELECT * FROM genre WHERE ID = ?";
-        try (PreparedStatement statement = connection.prepareStatement(SQL)) {
-            statement.setInt(1, genreId);
-            try (ResultSet rs = statement.executeQuery()) {
-                if (rs.next()) {
-                    String name = rs.getString("name");
-                    Genre genre = new Genre(name);
-                    genre.setId(rs.getInt("ID"));
-                    return genre;
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error getting genre by ID", e);
-        }
-        return null;
-    }
+
+
+
+
+
+
+
+
+
 }

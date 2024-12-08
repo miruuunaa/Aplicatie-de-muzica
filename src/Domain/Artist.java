@@ -79,8 +79,6 @@ public class Artist extends User  {
         if (!albums.contains(album)) {
             albums.add(album);
             System.out.println("Album '" + album.getTitle() + "' added to artist " + this.getName());
-        } else {
-            System.out.println("Album '" + album.getTitle() + "' is already added to " + this.getName());
         }
     }
 

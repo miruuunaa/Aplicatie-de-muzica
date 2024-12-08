@@ -19,6 +19,7 @@ public class MusicController {
     private final LiveConcertService liveConcertService;
     private final RecommendationService recommendationService;
     private final SubscriptionService subscriptionService;
+    private final GenreService genreService;
     private Listener currentListener;
 
 
@@ -36,7 +37,7 @@ public class MusicController {
      */
     public MusicController(ArtistService artistService, AlbumService albumService, SongService songService,
                            PlaylistService playlistService, ListenerService listenerService,
-                           LiveConcertService liveConcertService, RecommendationService recommendationService,SubscriptionService subscriptionService
+                           LiveConcertService liveConcertService, RecommendationService recommendationService,SubscriptionService subscriptionService,GenreService genreService
     ) {
         this.artistService = artistService;
         this.albumService = albumService;
@@ -46,6 +47,7 @@ public class MusicController {
         this.liveConcertService = liveConcertService;
         this.recommendationService = recommendationService;
         this.subscriptionService=subscriptionService;
+        this.genreService=genreService;
 
     }
 
@@ -594,6 +596,10 @@ public class MusicController {
      */
     public void setCurrentListener(Listener listener){
         this.currentListener=listener;
+    }
+
+    public List<Genre> getAllGenres() {
+        return genreService.getAllGenres();
     }
 }
 

@@ -10,36 +10,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Repository for Artist
+ */
 public class ArtistDBRepository extends DBRepository<Artist> {
-
-    private int currentId;
 
     public ArtistDBRepository(String DBUrl, String DBUser, String DBPassword) {
         super(DBUrl, DBUser, DBPassword);
-        this.currentId = getMaxIdFromDatabase() + 1;
-    }
 
-    private int getMaxIdFromDatabase() {
-        String SQL = "SELECT MAX(ID) AS maxId FROM Artist";
-        try (PreparedStatement statement = connection.prepareStatement(SQL);
-             ResultSet rs = statement.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt("maxId");
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Error reading max ID", e);
-        }
-        return 0;
     }
 
     @Override
     public void create(Artist obj) {
-        String SQL = "INSERT INTO Artist (ID, name, email) VALUES (?, ?, ?)";
+        String SQL = "INSERT INTO Artist (name, email) VALUES (?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(SQL)) {
-            obj.setId(currentId);
-            statement.setInt(1, currentId++);
-            statement.setString(2, obj.getName());
-            statement.setString(3, obj.getEmail());
+            statement.setString(1, obj.getName());
+            statement.setString(2, obj.getEmail());
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error adding Artist", e);
@@ -48,20 +34,23 @@ public class ArtistDBRepository extends DBRepository<Artist> {
 
     @Override
     public Artist read(int id) {
-        String SQL = "SELECT * FROM Artist WHERE ID = ?";
-        Artist artist = null;
+        String SQL = "SELECT * FROM Artist WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(SQL)) {
             statement.setInt(1, id);
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
-                    artist = readFromResultSet(rs);
-                    artist.setAlbums(getAlbumsForArtist(id));
+                    Artist artist = extractFromResultSet(rs);
+                    List<Album> albums = getAlbumsForArtist(artist.getId());
+                    artist.setAlbums(albums);
+                    return artist;
+                }else {
+                    return null;
                 }
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error reading artist", e);
         }
-        return artist;
+
     }
 
     @Override
@@ -71,7 +60,7 @@ public class ArtistDBRepository extends DBRepository<Artist> {
             statement.setInt(1, id);
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
-                    return readFromResultSet(rs);
+                    return extractFromResultSet(rs);
                 }
             }
         } catch (SQLException e) {
@@ -82,7 +71,7 @@ public class ArtistDBRepository extends DBRepository<Artist> {
 
     @Override
     public void update(Artist obj) {
-        String SQL = "UPDATE Artist SET name = ?, email = ? WHERE ID = ?";
+        String SQL = "UPDATE Artist SET name = ?, email = ? WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(SQL)) {
             statement.setString(1, obj.getName());
             statement.setString(2, obj.getEmail());
@@ -95,7 +84,7 @@ public class ArtistDBRepository extends DBRepository<Artist> {
 
     @Override
     public void delete(int id) {
-        String SQL = "DELETE FROM Artist WHERE ID = ?";
+        String SQL = "DELETE FROM Artist WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(SQL)) {
             statement.setInt(1, id);
             statement.executeUpdate();
@@ -111,7 +100,8 @@ public class ArtistDBRepository extends DBRepository<Artist> {
         try (PreparedStatement statement = connection.prepareStatement(SQL)) {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                Artist artist = readFromResultSet(resultSet);
+                Artist artist = extractFromResultSet(resultSet);
+                artist.setAlbums(getAlbumsForArtist(artist.getId()));
                 artistMap.put(artist.getId(), artist);
             }
         } catch (SQLException e) {
@@ -120,24 +110,28 @@ public class ArtistDBRepository extends DBRepository<Artist> {
         return artistMap;
     }
 
-    private static Artist readFromResultSet(ResultSet rs) throws SQLException {
-        String name = rs.getString("name");
-        String email = rs.getString("email");
+    private static Artist extractFromResultSet(ResultSet resultSet) throws SQLException {
+        String name = resultSet.getString("name");
+        String email = resultSet.getString("email");
+        int id = resultSet.getInt("id");
         Artist artist = new Artist(name, email);
-        artist.setId(rs.getInt("ID"));
+        artist.setId(id);
         return artist;
     }
 
     private List<Album> getAlbumsForArtist(int artistId) {
-        String SQL = "SELECT * FROM Album WHERE artistId = ?";
+        String SQL = "SELECT * FROM Album WHERE artist_id = ?";
         List<Album> albums = new ArrayList<>();
         try (PreparedStatement statement = connection.prepareStatement(SQL)) {
             statement.setInt(1, artistId);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 String title = rs.getString("title");
-                LocalDate releaseDate = rs.getDate("releaseDate").toLocalDate();
+                LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
                 Artist artist = get(artistId);
+                if (artist == null) {
+                    throw new RuntimeException("Artist not found for ID: " + artistId);
+                }
                 Album album = new Album(title, releaseDate, artist);
                 albums.add(album);
             }
