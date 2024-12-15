@@ -16,13 +16,13 @@ import Service.*;
 public class MusicApp {
     public static void main(String[] args) {
         //Repo-inmemory
-        //IRepository<Artist> artistRepository = createInMemoryArtistRepository();
-        //IRepository<Album> albumRepository =  createInMemoryAlbumRepository(artistRepository);
-        //IRepository<Song> songRepository = createInMemorySongRepository(albumRepository);
-        //IRepository<LiveConcert> concertRepository = createInMemoryLiveConcertRepository(artistRepository);
-        //IRepository<Playlist> playlistRepository = new InMemoryRepository<>();
-        //IRepository<Listener> listenerRepository = createInMemoryListenerRepository();
-        //IRepository<Subscription> subscriptionRepository = createInMemorySubscriptionRepository(listenerRepository);
+        IRepository<Artist> artistRepository = createInMemoryArtistRepository();
+        IRepository<Album> albumRepository =  createInMemoryAlbumRepository(artistRepository);
+        IRepository<Song> songRepository = createInMemorySongRepository(albumRepository);
+        IRepository<LiveConcert> concertRepository = createInMemoryLiveConcertRepository(artistRepository);
+        IRepository<Playlist> playlistRepository = new InMemoryRepository<>();
+        IRepository<Listener> listenerRepository = createInMemoryListenerRepository();
+        IRepository<Subscription> subscriptionRepository = createInMemorySubscriptionRepository(listenerRepository);
 
         //Repo-file
         //IRepository<Artist> artistRepository = createFileBasedArtistRepository();
@@ -34,18 +34,18 @@ public class MusicApp {
         //IRepository<Subscription> subscriptionRepository = createFileBasedSubscriptionRepository(listenerRepository);
 
         //Repo-DB
-        String url = "jdbc:postgresql://localhost:5432/MTifyDatabase";
-        String user ="postgres";
-        String password = "1111";
-        ArtistDBRepository artistRepository=new ArtistDBRepository(url,user,password);
-        AlbumDBRepository albumRepository=new AlbumDBRepository(url,user,password);
-        SongDBRepository songRepository=new SongDBRepository(url,user,password);
-        LiveConcertDBRepository concertRepository=new LiveConcertDBRepository(url,user,password);
-        PlaylistDBRepository playlistRepository=new PlaylistDBRepository(url,user,password);
-        ListenerDBRepository listenerRepository=new ListenerDBRepository(url,user,password);
-        SubscriptionDBRepository subscriptionRepository=new SubscriptionDBRepository(url,user,password);
-        HistoryDBRepository historyDBRepository=new HistoryDBRepository(url,user,password);
-        GenreDBRepository genreDBRepository=new GenreDBRepository(url,user,password);
+//        String url = "jdbc:postgresql://localhost:5432/MTifyDatabase";
+//        String user ="postgres";
+//        String password = "1111";
+//        ArtistDBRepository artistRepository=new ArtistDBRepository(url,user,password);
+//        AlbumDBRepository albumRepository=new AlbumDBRepository(url,user,password);
+//        SongDBRepository songRepository=new SongDBRepository(url,user,password);
+//        LiveConcertDBRepository concertRepository=new LiveConcertDBRepository(url,user,password);
+//        PlaylistDBRepository playlistRepository=new PlaylistDBRepository(url,user,password);
+//        ListenerDBRepository listenerRepository=new ListenerDBRepository(url,user,password);
+//        SubscriptionDBRepository subscriptionRepository=new SubscriptionDBRepository(url,user,password);
+//        HistoryDBRepository historyDBRepository=new HistoryDBRepository(url,user,password);
+//        GenreDBRepository genreDBRepository=new GenreDBRepository(url,user,password);
 
 
         //Service
@@ -56,7 +56,8 @@ public class MusicApp {
         PlaylistService playlistService=new PlaylistService(playlistRepository);
         ListenerService listenerService=new ListenerService(listenerRepository,subscriptionRepository);
         SubscriptionService subscriptionService=new SubscriptionService(subscriptionRepository);
-        GenreService genreService=new GenreService(genreDBRepository);
+        GenreService genreService = new GenreService(new InMemoryRepository<Genre>());
+
 
         Listener listener = listenerRepository.get(0);
         History userHistory = new History(listener);

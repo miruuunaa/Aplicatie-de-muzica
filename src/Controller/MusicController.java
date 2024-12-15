@@ -602,4 +602,3 @@ public class MusicController {
         return genreService.getAllGenres();
     }
 }
-

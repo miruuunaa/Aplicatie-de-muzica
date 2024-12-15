@@ -52,7 +52,8 @@ public class Album {
         return songs;
     }
 
-    public void setSongs(List<Song> songs) {
+
+    public void setSongs(List<Song>songs){
         this.songs = songs;
     }
 
@@ -129,5 +130,9 @@ public class Album {
                 ", releaseDate=" + releaseDate +
                 ", artist=" + artist.getName() +
                 '}';
+    }
+
+    public void setArtist(Artist artist) {
+        this.artist= artist;
     }
 }
