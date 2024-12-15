@@ -4,6 +4,10 @@ import Domain.Song;
 import Domain.Subscription;
 import Repository.IRepository;
 
+import Exceptions.BusinessLogicException;
+import Exceptions.EntityNotFoundException;
+import Exceptions.ValidationException;
+
 /**
  * SubscriptionService is responsible for managing and updating user subscriptions.
  * It allows users to upgrade, downgrade, and cancel their subscriptions.
@@ -18,8 +22,12 @@ public class SubscriptionService {
      * Constructor to initialize SubscriptionService with a given subscription repository.
      *
      * @param subscriptionRepository The repository used to store and manage subscriptions.
+     * @throws ValidationException if the repository is null.
      */
     public SubscriptionService(IRepository<Subscription> subscriptionRepository) {
+        if (subscriptionRepository == null) {
+            throw new ValidationException("Subscription repository cannot be null.");
+        }
         this.subscriptionRepository = subscriptionRepository;
     }
 
@@ -32,22 +40,25 @@ public class SubscriptionService {
      *
      * @param listener The listener whose subscription is to be updated.
      * @param newType The type to upgrade or downgrade the subscription to ("basic" or "premium").
+     * @throws EntityNotFoundException if the listener does not have a subscription.
+     * @throws ValidationException if the newType is invalid.
      */
-
     public void upgradeSubscription(Listener listener, String newType) {
+        if (newType == null || newType.trim().isEmpty()) {
+            throw new ValidationException("Subscription type cannot be null or empty.");
+        }
+
         Subscription currentSubscription = listener.getSubscription();
 
         if (currentSubscription == null) {
-            System.out.println("No existing subscription found. Please subscribe to upgrade.");
-            return;
+            throw new EntityNotFoundException("No existing subscription found. Please subscribe to upgrade.");
         }
 
         String currentType = currentSubscription.getType().toLowerCase();
         String targetType = newType.toLowerCase();
 
         if (currentType.equals(targetType)) {
-            System.out.println("You already have the " + newType + " subscription.");
-            return;
+            throw new BusinessLogicException("You already have the " + newType + " subscription.");
         }
 
         switch (targetType) {
@@ -57,7 +68,7 @@ public class SubscriptionService {
                     currentSubscription.setPrice(PREMIUM_PRICE);
                     System.out.println("Subscription upgraded to Premium at price " + PREMIUM_PRICE + ".");
                 } else {
-                    System.out.println("Invalid upgrade. You cannot upgrade to the requested type.");
+                    throw new BusinessLogicException("Invalid upgrade. You cannot upgrade to the requested type.");
                 }
                 break;
             case "basic":
@@ -66,30 +77,34 @@ public class SubscriptionService {
                     currentSubscription.setPrice(BASIC_PRICE);
                     System.out.println("Subscription downgraded to Basic at price " + BASIC_PRICE + ".");
                 } else {
-                    System.out.println("Invalid downgrade. You cannot downgrade to the requested type.");
+                    throw new BusinessLogicException("Invalid downgrade. You cannot downgrade to the requested type.");
                 }
                 break;
             default:
-                System.out.println("Invalid subscription type. Please choose 'basic' or 'premium'.");
+                throw new ValidationException("Invalid subscription type. Please choose 'basic' or 'premium'.");
         }
     }
 
     /**
      * Creates a subscription for a listener based on the provided username and subscription type.
-     * @param listener The username of the listener who will be assigned the subscription.
+     * @param listener The listener who will be assigned the subscription.
      * @param subscriptionType The type of subscription to be created for the listener (e.g., "Premium" or "Basic").
+     * @throws ValidationException if the subscription type is invalid.
      */
     public void createSubscription(Listener listener, String subscriptionType) {
+        if (subscriptionType == null || subscriptionType.trim().isEmpty()) {
+            throw new ValidationException("Subscription type cannot be null or empty.");
+        }
 
         if (!subscriptionType.equals("basic") && !subscriptionType.equals("premium")) {
-            System.out.println("Invalid subscription type.");
-            return;
+            throw new ValidationException("Invalid subscription type.");
         }
+
         float price = (subscriptionType.equals("basic")) ? BASIC_PRICE : PREMIUM_PRICE;
         Subscription subscription = new Subscription(subscriptionType, price, listener);
         subscriptionRepository.create(subscription);
         listener.setSubscription(subscription);
-        System.out.println("Subscription created successfully for " + listener.getName() + " as " + subscriptionType+"!");
+        System.out.println("Subscription created successfully for " + listener.getName() + " as " + subscriptionType + "!");
     }
     /**
      * Cancels the subscription of a listener (user).
@@ -99,22 +114,23 @@ public class SubscriptionService {
      *
      * @param listener The listener whose subscription is to be canceled.
      * @return Returns true if the subscription is successfully canceled, otherwise false.
+     * @throws EntityNotFoundException if no active subscription is found for the listener.
      */
     public boolean cancelSubscription(Listener listener) {
         Subscription subscription = listener.getSubscription();
-        if (subscription != null) {
-            int subscriptionId = subscription.getId();
-            if (subscriptionId != 0) {
-                subscriptionRepository.delete(subscriptionId);
-                listener.setSubscription(null);
-                System.out.println("Subscription canceled for " + listener.getName());
-                return true;
-            } else {
-                System.out.println("Invalid subscription ID.");
-            }
-        } else {
-            System.out.println("No subscription found for " + listener.getName());
+
+        if (subscription == null) {
+            throw new EntityNotFoundException("No subscription found for " + listener.getName());
         }
-        return false;
+
+        int subscriptionId = subscription.getId();
+        if (subscriptionId != 0) {
+            subscriptionRepository.delete(subscriptionId);
+            listener.setSubscription(null);
+            System.out.println("Subscription canceled for " + listener.getName());
+            return true;
+        } else {
+            throw new BusinessLogicException("Invalid subscription ID.");
+        }
     }
 }

@@ -9,6 +9,9 @@ import Repository.IRepository;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import Exceptions.EntityNotFoundException;
+import Exceptions.ValidationException;
+
 /**
  * The ArtistService class provides methods for managing artists within the music system.
  * It allows for the retrieval of artist data, enrolling listeners to follow artists,
@@ -16,7 +19,6 @@ import java.util.stream.Collectors;
  */
 public class ArtistService {
     private final IRepository<Artist> artistRepository;
-
 
     /**
      * Constructor that initializes the ArtistService with the given artist repository.
@@ -33,6 +35,9 @@ public class ArtistService {
      * @param artist The artist to be added to the repository.
      */
     public void addArtist(Artist artist) {
+        if (artist == null) {
+            throw new ValidationException("Artist cannot be null.");
+        }
         artistRepository.create(artist);
     }
 
@@ -43,6 +48,12 @@ public class ArtistService {
      * @param artist The artist to be followed by the listener.
      */
     public void enrollListenerToArtist(Listener listener, Artist artist) {
+        if (listener == null) {
+            throw new ValidationException("Listener cannot be null.");
+        }
+        if (artist == null) {
+            throw new EntityNotFoundException("Artist not found.");
+        }
         artist.getFollowers().add(listener);
     }
 
@@ -50,15 +61,23 @@ public class ArtistService {
      * Retrieves an artist from the repository based on their name.
      *
      * @param name The name of the artist to retrieve.
-     * @return The artist with the specified name, or null if no artist is found.
+     * @return The artist with the specified name, or throws an exception if no artist is found.
      */
     public Artist getArtistByName(String name) {
-        for (Artist artist : artistRepository.getAll().values()) {
-            if (artist.getName().equalsIgnoreCase(name)) {
-                return artist;
-            }
+        if (name == null || name.isEmpty()) {
+            throw new ValidationException("Artist name cannot be null or empty.");
         }
-        return null;
+
+        Artist artist = artistRepository.getAll().values().stream()
+                .filter(a -> a.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
+
+        if (artist == null) {
+            throw new EntityNotFoundException("Artist with name '" + name + "' not found.");
+        }
+
+        return artist;
     }
 
     /**
@@ -68,6 +87,10 @@ public class ArtistService {
      * @param artistName The name of the artist whose discography will be displayed.
      */
     public void showDiscography(String artistName) {
+        if (artistName == null || artistName.isEmpty()) {
+            throw new ValidationException("Artist name cannot be null or empty.");
+        }
+
         Artist artist = artistRepository.getAll().values()
                 .stream()
                 .filter(a -> a.getName().equalsIgnoreCase(artistName))
@@ -101,15 +124,18 @@ public class ArtistService {
      * @return List of albums matching the genre.
      */
     public List<Album> filterAlbumsByGenre(int artistId, String genreName) {
-        Artist artist = artistRepository.get(artistId);
-        if (artist != null) {
-            return artist.getAlbums().stream()
-                    .filter(album -> album.getGenre().getName().equalsIgnoreCase(genreName))
-                    .collect(Collectors.toList());
-        } else {
-            System.out.println("Artist not found.");
-            return Collections.emptyList();
+        if (genreName == null || genreName.isEmpty()) {
+            throw new ValidationException("Genre name cannot be null or empty.");
         }
+
+        Artist artist = artistRepository.get(artistId);
+        if (artist == null) {
+            throw new EntityNotFoundException("Artist with ID '" + artistId + "' not found.");
+        }
+
+        return artist.getAlbums().stream()
+                .filter(album -> album.getGenre().getName().equalsIgnoreCase(genreName))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -120,16 +146,19 @@ public class ArtistService {
      * @return List of songs with duration greater than or equal to minDuration.
      */
     public List<Song> filterSongsByMinimumDuration(int artistId, float minDuration) {
-        Artist artist = artistRepository.get(artistId);
-        if (artist != null) {
-            return artist.getAlbums().stream()
-                    .flatMap(album -> album.getSongs().stream())
-                    .filter(song -> song.getDuration() >= minDuration)
-                    .collect(Collectors.toList());
-        } else {
-            System.out.println("Artist not found.");
-            return Collections.emptyList();
+        if (minDuration <= 0) {
+            throw new ValidationException("Minimum duration must be greater than 0.");
         }
+
+        Artist artist = artistRepository.get(artistId);
+        if (artist == null) {
+            throw new EntityNotFoundException("Artist with ID '" + artistId + "' not found.");
+        }
+
+        return artist.getAlbums().stream()
+                .flatMap(album -> album.getSongs().stream())
+                .filter(song -> song.getDuration() >= minDuration)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -141,7 +170,7 @@ public class ArtistService {
     public List<Album> sortAlbumsByReleaseDate(int artistId) {
         Artist artist = artistRepository.get(artistId);
         if (artist == null) {
-            throw new IllegalArgumentException("Artist not found.");
+            throw new EntityNotFoundException("Artist with ID '" + artistId + "' not found.");
         }
         return artist.getAlbums().stream()
                 .sorted(Comparator.comparing(Album::getReleaseDate))
@@ -161,13 +190,11 @@ public class ArtistService {
                     .sum();
             artistSongCountMap.put(artist, totalSongs);
         }
+
         return artistSongCountMap.entrySet().stream()
                 .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
     }
-
-
-
 
 }

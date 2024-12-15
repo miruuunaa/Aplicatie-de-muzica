@@ -8,6 +8,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import Exceptions.BusinessLogicException;
+import Exceptions.EntityNotFoundException;
+import Exceptions.ValidationException;
+
+
 /**
  * The AlbumService class provides various methods to manage albums within the music system.
  * It allows for the retrieval of available albums, the addition and removal of songs from albums,
@@ -31,6 +36,9 @@ public class AlbumService {
      * @return A list of all albums in the repository.
      */
     public List<Album> getAvailableAlbums() {
+        if (albumRepository.getAll().isEmpty()) {
+            throw new EntityNotFoundException("No albums available in the repository.");
+        }
         return new ArrayList<>(albumRepository.getAll().values());
     }
 
@@ -41,6 +49,9 @@ public class AlbumService {
      * @return A list of songs contained in the specified album.
      */
     public List<Song> getSongsInAlbum(Album album) {
+        if (album == null) {
+            throw new ValidationException("Album cannot be null.");
+        }
         return album.getSongs();
     }
 
@@ -52,13 +63,20 @@ public class AlbumService {
      * @param song  The song to be removed from the album.
      */
     public void removeSongFromAlbum(Album album, Song song) {
-        if (album.getSongs().contains(song)) {
-            album.getSongs().remove(song);
-            System.out.println(song.getTitle() + " removed from album " + album.getTitle() + ".");
-        } else {
-            System.out.println("Song not found in album.");
+        if (album == null) {
+            throw new ValidationException("Album cannot be null.");
         }
+        if (song == null) {
+            throw new ValidationException("Song cannot be null.");
+        }
+        if (!album.getSongs().contains(song)) {
+            throw new EntityNotFoundException("Song '" + song.getTitle() + "' not found in album '" + album.getTitle() + "'.");
+        }
+
+        album.getSongs().remove(song);
+        System.out.println(song.getTitle() + " removed from album " + album.getTitle() + ".");
     }
+
 
     /**
      * Validates if the album exceeds the maximum allowed number of songs.
@@ -68,12 +86,20 @@ public class AlbumService {
      * @return true if the album contains fewer or equal to the maximum number of songs, false otherwise.
      */
     public boolean validateAlbumSongs(Album album, int maxSongs) {
-        if (album.getSongs().size() > maxSongs) {
-            System.out.println("Album " + album.getTitle() + " exceeds the maximum allowed songs.");
-            return false;
+        if (album == null) {
+            throw new ValidationException("Album cannot be null.");
         }
+        if (maxSongs <= 0) {
+            throw new ValidationException("Maximum number of songs must be greater than 0.");
+        }
+
+        if (album.getSongs().size() > maxSongs) {
+            throw new BusinessLogicException("Album '" + album.getTitle() + "' exceeds the maximum allowed songs (" + maxSongs + ").");
+        }
+
         return true;
     }
+
 
     /**
      * Adds a new album to the repository.
@@ -81,6 +107,9 @@ public class AlbumService {
      * @param album The album to be added to the repository.
      */
     public void addAlbum(Album album) {
+        if (album == null) {
+            throw new ValidationException("Album cannot be null.");
+        }
         albumRepository.create(album);
     }
 
@@ -91,13 +120,19 @@ public class AlbumService {
      * @return The album with the specified name, or null if no album is found.
      */
     public Album getAlbumByName(String albumName) {
+        if (albumName == null || albumName.isEmpty()) {
+            throw new ValidationException("Album name cannot be null or empty.");
+        }
+
         for (Album album : albumRepository.getAll().values()) {
             if (album.getTitle().equalsIgnoreCase(albumName)) {
                 return album;
             }
         }
-        return null;
+
+        throw new EntityNotFoundException("Album with name '" + albumName + "' not found.");
     }
+
 
     /**
      * Sort songs of an album by the title
@@ -108,14 +143,12 @@ public class AlbumService {
     public List<Song> sortSongsByTitle(int albumId) {
         Album album = albumRepository.get(albumId);
         if (album == null) {
-            throw new IllegalArgumentException("Album not found.");
+            throw new EntityNotFoundException("Album with ID '" + albumId + "' not found.");
         }
         return album.getSongs().stream()
                 .sorted(Comparator.comparing(Song::getTitle))
                 .collect(Collectors.toList());
     }
-
-
 
 
 }

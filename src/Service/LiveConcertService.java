@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import Exceptions.EntityNotFoundException;
+import Exceptions.ValidationException;
+
 /**
  * The LiveConcertService class provides methods for managing live concerts in the system.
  * It allows for adding, retrieving, starting, ending concerts, checking ticket availability,
@@ -16,70 +19,90 @@ import java.util.List;
 public class LiveConcertService {
     private final IRepository<LiveConcert> concertRepository;
 
-
     /**
      * Constructor that initializes the LiveConcertService with the given concert repository.
      *
      * @param concertRepository The repository used to store and manage live concert data.
      */
     public LiveConcertService(IRepository<LiveConcert> concertRepository) {
+        if (concertRepository == null) {
+            throw new ValidationException("Concert repository cannot be null.");
+        }
         this.concertRepository = concertRepository;
     }
-
 
     /**
      * Retrieves a concert by its title from the repository.
      *
      * @param concertTitle The title of the concert to retrieve.
      * @return The concert with the specified title, or null if no concert is found.
+     * @throws EntityNotFoundException if no concert with the specified title is found.
      */
     public LiveConcert getConcertByTitle(String concertTitle) {
-        return concertRepository.getAll().values().stream()
-                .filter(concert -> concert.getTitle().equalsIgnoreCase(concertTitle))
+        if (concertTitle == null || concertTitle.trim().isEmpty()) {
+            throw new ValidationException("Concert title cannot be null or empty.");
+        }
+
+        LiveConcert concert = concertRepository.getAll().values().stream()
+                .filter(c -> c.getTitle().equalsIgnoreCase(concertTitle))
                 .findFirst()
                 .orElse(null);
+
+        if (concert == null) {
+            throw new EntityNotFoundException("Concert with title " + concertTitle + " not found.");
+        }
+
+        return concert;
     }
 
     /**
      * Starts a concert by changing its status to started.
      *
      * @param concertTitle The title of the concert to start.
+     * @throws EntityNotFoundException if the concert is not found.
      */
     public void startConcert(String concertTitle) {
+        if (concertTitle == null || concertTitle.trim().isEmpty()) {
+            throw new ValidationException("Concert title cannot be null or empty.");
+        }
+
         LiveConcert concert = getAvailableConcerts()
                 .stream()
                 .filter(c -> c.getTitle().equalsIgnoreCase(concertTitle))
                 .findFirst()
                 .orElse(null);
 
-        if (concert != null) {
-
-            concert.setStarted(true);
-            System.out.println("The Concert " + concert.getTitle() + " has started.");
-        } else {
-            System.out.println("Concert not found.");
+        if (concert == null) {
+            throw new EntityNotFoundException("Concert not found.");
         }
+
+        concert.setStarted(true);
+        System.out.println("The Concert " + concert.getTitle() + " has started.");
     }
 
     /**
      * Ends a concert by changing its status to ended.
      *
      * @param concertTitle The title of the concert to end.
+     * @throws EntityNotFoundException if the concert is not found.
      */
     public void endConcert(String concertTitle) {
+        if (concertTitle == null || concertTitle.trim().isEmpty()) {
+            throw new ValidationException("Concert title cannot be null or empty.");
+        }
+
         LiveConcert concert = getAvailableConcerts()
                 .stream()
                 .filter(c -> c.getTitle().equalsIgnoreCase(concertTitle))
                 .findFirst()
                 .orElse(null);
 
-        if (concert != null) {
-
-            concert.setEnded(true);
-            System.out.println("The Concert " + concert.getTitle() + " has ended.");
-        } else {
-            System.out.println("Concert not found.");
+        if (concert == null) {
+            throw new EntityNotFoundException("Concert not found.");
         }
+
+        concert.setEnded(true);
+        System.out.println("The Concert " + concert.getTitle() + " has ended.");
     }
 
     /**
@@ -87,20 +110,26 @@ public class LiveConcertService {
      *
      * @param concertTitle The title of the concert to check ticket availability.
      * @return true if tickets are available, false otherwise.
+     * @throws EntityNotFoundException if the concert is not found.
      */
     public boolean checkTicketAvailability(String concertTitle) {
+        if (concertTitle == null || concertTitle.trim().isEmpty()) {
+            throw new ValidationException("Concert title cannot be null or empty.");
+        }
+
         LiveConcert concert = getAvailableConcerts()
                 .stream()
                 .filter(c -> c.getTitle().equalsIgnoreCase(concertTitle))
                 .findFirst()
                 .orElse(null);
-        if (concert != null) {
-            return concert.getAvailableSeats() > 0;
-        } else {
-            System.out.println("Concert not found.");
-            return false;
+
+        if (concert == null) {
+            throw new EntityNotFoundException("Concert not found.");
         }
+
+        return concert.getAvailableSeats() > 0;
     }
+
     /**
      * Retrieves the list of available concerts.
      *
@@ -113,20 +142,23 @@ public class LiveConcertService {
     /**
      * Adds a listener as an attendee to a concert, either to the early access list (if they have a premium subscription)
      * or the regular access list (if they have a basic subscription).
+     *
      * @param concertId The ID of the concert to which the listener is being added.
      * @param listener The listener to be added as an attendee.
      * @return {@code true} if the listener was successfully added to the appropriate access list (early or regular),
-     *         {@code false} if the listener is already on the respective list or if there are any issues (e.g., concert or listener not found).*/
+     *         {@code false} if the listener is already on the respective list or if there are any issues (e.g., concert or listener not found).
+     * @throws EntityNotFoundException if the concert or listener is not found.
+     */
     public boolean addAttendee(int concertId, Listener listener) {
+        if (listener == null) {
+            throw new EntityNotFoundException("Listener not found.");
+        }
+
         LiveConcert concert = concertRepository.get(concertId);
         if (concert == null) {
-            System.out.println("Concert not found.");
-            return false;
+            throw new EntityNotFoundException("Concert not found.");
         }
-        if (listener == null) {
-            System.out.println("Listener not found.");
-            return false;
-        }
+
         if (listener.hasPremiumSubscription()) {
             if (concert.getEarlyAccessList().contains(listener)) {
                 System.out.println("Listener is already in the early access list.");
@@ -147,34 +179,27 @@ public class LiveConcertService {
 
     /**
      * Displays the list of attendees for a given concert by its title, categorized into early access and regular access attendees.
-     * The method prints the names of listeners who have access to the concert based on their subscription type:
-     * those with premium subscriptions are listed under early access, and those with basic subscriptions are listed under regular access.
-     * If a list is empty, a message is displayed indicating no attendees in that category.
-     * @param concertTitle The title of the concert for which the attendees are being displayed.*/
+     *
+     * @param concertTitle The title of the concert for which the attendees are being displayed.
+     * @throws EntityNotFoundException if the concert is not found.
+     */
     public void showAttendees(String concertTitle) {
         LiveConcert concert = getConcertByTitle(concertTitle);
 
-        if (concert != null) {
-            List<Listener> earlyAccessList = concert.getEarlyAccessList();
-            if (earlyAccessList != null && !earlyAccessList.isEmpty()) {
-                System.out.println("Early access attendees for the concert " + concert.getTitle() + ":");
-                for (Listener attendee : earlyAccessList) {
-                    System.out.println("- " + attendee.getName());
-                }
-            } else {
-                System.out.println("No early access attendees for this concert.");
-            }
-            List<Listener> regularList = concert.getRegularAccesList();
-            if (regularList != null && !regularList.isEmpty()) {
-                System.out.println("Regular access attendees for the concert " + concert.getTitle() + ":");
-                for (Listener attendee : regularList) {
-                    System.out.println("- " + attendee.getName());
-                }
-            } else {
-                System.out.println("No regular access attendees for this concert.");
-            }
+        List<Listener> earlyAccessList = concert.getEarlyAccessList();
+        if (earlyAccessList != null && !earlyAccessList.isEmpty()) {
+            System.out.println("Early access attendees for the concert " + concert.getTitle() + ":");
+            earlyAccessList.forEach(attendee -> System.out.println("- " + attendee.getName()));
         } else {
-            System.out.println("Concert not found.");
+            System.out.println("No early access attendees for this concert.");
+        }
+
+        List<Listener> regularList = concert.getRegularAccesList();
+        if (regularList != null && !regularList.isEmpty()) {
+            System.out.println("Regular access attendees for the concert " + concert.getTitle() + ":");
+            regularList.forEach(attendee -> System.out.println("- " + attendee.getName()));
+        } else {
+            System.out.println("No regular access attendees for this concert.");
         }
     }
 
@@ -184,19 +209,15 @@ public class LiveConcertService {
      * @param listener The listener for whom to calculate the score.
      * @param concertId The ID of the concert.
      * @return The calculated VIP score.
-     * @throws IllegalArgumentException If the concert is not found.
+     * @throws EntityNotFoundException if the concert is not found.
      */
     public double calculateConcertVIPScore(Listener listener, int concertId) {
         LiveConcert concert = concertRepository.get(concertId);
         if (concert == null) {
-            throw new IllegalArgumentException("Concert not found.");
+            throw new EntityNotFoundException("Concert not found.");
         }
-        double score = 0;
-        if (listener.hasPremiumSubscription()) {
-            score += 30;
-        }else{
-            score+=10;
-        }
+
+        double score = listener.hasPremiumSubscription() ? 30 : 10;
 
         if (concert.isArtistFamous()) {
             score += 50;
@@ -213,8 +234,15 @@ public class LiveConcertService {
         return score;
     }
 
-    public void addConcert(LiveConcert concert){
+    /**
+     * Adds a new concert to the repository.
+     *
+     * @param concert The concert to be added.
+     */
+    public void addConcert(LiveConcert concert) {
+        if (concert == null) {
+            throw new ValidationException("Concert cannot be null.");
+        }
         concertRepository.create(concert);
     }
-
 }
