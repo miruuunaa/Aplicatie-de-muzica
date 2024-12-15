@@ -4,6 +4,9 @@ import Repository.IRepository;
 import java.util.ArrayList;
 import java.util.List;
 
+import Exceptions.EntityNotFoundException;
+import Exceptions.ValidationException;
+
 /**
  * SongService is responsible for managing and interacting with songs in the repository.
  * It provides various methods to add songs, retrieve them by title, play, stop, and pause songs.
@@ -17,25 +20,36 @@ public class SongService {
      * Constructor that initializes the SongService with a song repository.
      *
      * @param songRepository The repository used to store and retrieve songs.
+     * @throws ValidationException if the repository is null.
      */
     public SongService(IRepository<Song> songRepository) {
+        if (songRepository == null) {
+            throw new ValidationException("Song repository cannot be null.");
+        }
         this.songRepository = songRepository;
     }
+
 
     /**
      * Retrieves a song by its title from the repository.
      * The search is case-insensitive, so "songTitle" and "SONGTITLE" will be treated the same.
      *
      * @param title The title of the song to retrieve.
-     * @return The song with the specified title, or null if no song is found.
+     * @return The song with the specified title, or throws an exception if not found.
+     * @throws EntityNotFoundException if no song with the specified title is found.
      */
     public Song getSongByTitle(String title) {
+        if (title == null || title.trim().isEmpty()) {
+            throw new ValidationException("Song title cannot be null or empty.");
+        }
+
         for (Song song : songRepository.getAll().values()) {
             if (song.getTitle().equalsIgnoreCase(title)) {
                 return song;
             }
         }
-        return null;
+
+        throw new EntityNotFoundException("Song with title " + title + " not found.");
     }
 
     /**
@@ -43,10 +57,16 @@ public class SongService {
      * The song is stored in the repository for later retrieval and management.
      *
      * @param song The song to be added.
+     * @throws ValidationException if the song is null.
      */
     public void addSong(Song song) {
+        if (song == null) {
+            throw new ValidationException("Song cannot be null.");
+        }
+
         songRepository.create(song);
     }
+
 
     /**
      * Retrieves a list of all songs stored in the song repository.
@@ -58,15 +78,20 @@ public class SongService {
         return new ArrayList<>(songRepository.getAll().values());
     }
 
+
     /**
      * Starts playing the specified song.
      * This method invokes the play method on the Song object to begin playback.
      *
      * @param song The song to be played.
+     * @throws EntityNotFoundException if the song is null.
      */
     public void playSong(Song song) {
-        song.play();
+        if (song == null) {
+            throw new EntityNotFoundException("Song not found.");
+        }
 
+        song.play();
     }
 
     /**
@@ -74,10 +99,14 @@ public class SongService {
      * This method invokes the stop method on the Song object to halt playback.
      *
      * @param song The song to be stopped.
+     * @throws EntityNotFoundException if the song is null.
      */
-    public void stopSong(Song song){
-        song.stop();
+    public void stopSong(Song song) {
+        if (song == null) {
+            throw new EntityNotFoundException("Song not found.");
+        }
 
+        song.stop();
     }
 
     /**
@@ -85,9 +114,13 @@ public class SongService {
      * This method invokes the pause method on the Song object to pause the playback.
      *
      * @param song The song to be paused.
+     * @throws EntityNotFoundException if the song is null.
      */
-    public void pauseSong(Song song){
-        song.pause();
+    public void pauseSong(Song song) {
+        if (song == null) {
+            throw new EntityNotFoundException("Song not found.");
+        }
 
+        song.pause();
     }
 }
