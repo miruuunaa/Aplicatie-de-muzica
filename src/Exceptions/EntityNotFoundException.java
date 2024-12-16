@@ -1,8 +1,9 @@
 package Exceptions;
 
 /**
- * EntityNotFoundException: Se declanșează când o entitate nu este găsită.
- */
+ * This exception extends RuntimeException and is typically used in
+ * scenarios where a search or retrieval operation fails to locate an
+ * entity by its identifier or unique criteria.*/
 public class EntityNotFoundException extends RuntimeException {
     public EntityNotFoundException(String message) {
         super(message);
