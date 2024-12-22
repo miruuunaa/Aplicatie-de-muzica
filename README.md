@@ -2,96 +2,246 @@
 
 Die Anwendung namens "MTIFY Music" bietet die Möglichkeit um die beliebtesten Musikgenres aud persönlichen Tops anzuhören mit ein höhsten Qualität.
 Bietet die Posibilität an Live-Konzerten teilzunehmen.
-Die Vorteile eines Premium-Kontos sind:
+Die Vorteile eines Premium-Kontos sind:(trebuie refacut)
 -die Kommentare in einer Live-Konzert sind mehr zugänglich für die Artisten;
 -exklusiver Zugriff auf die neuen Musikalben/Musikstücke;
 -Offline-Abhören;
 -Live-Verse-Funktion.
 
-1. User (Abstrakte Klasse)
-Die User-Klasse ist eine Basisklasse und repräsentiert einen generischen Benutzer im System. Sie enthält Attribute wie name und email zur Speicherung von Benutzerdaten und hat die Methoden login() und logout() zur Verwaltung der Benutzersitzungen.
+Liste der Funktionalitäten:
+1. sortSongsByTitle(int albumId)
+        Sortiert alle Songs eines bestimmten Albums nach ihrem Titel alphabetisch.
+        Parameter: albumId – die ID des Albums.
+        Rückgabewert: Eine sortierte Liste von Songs.
+        Fehler: Löst eine Ausnahme aus, wenn das Album nicht gefunden wird.
+   
+2. filterAlbumsByGenre(int artistId, String genreName)
+        Filtert die Alben eines bestimmten Künstlers nach Genre.
+        Parameter: artistId – die ID des Künstlers, genreName – der Name des Genres.
+        Rückgabewert: Eine Liste von Alben, die dem angegebenen Genre entsprechen, oder eine leere Liste, wenn kein Künstler gefunden wird.
+   
+3. filterSongsByMinimumDuration(int artistId, float minDuration)
+        Filtert Songs eines Künstlers basierend auf einer minimalen Dauer.
+        Parameter: artistId – die ID des Künstlers, minDuration – die Mindestlänge eines Songs in Minuten.
+        Rückgabewert: Eine Liste von Songs, die die Daueranforderung erfüllen. Gibt eine leere Liste zurück, wenn der Künstler nicht gefunden wird.
+   
+4. sortAlbumsByReleaseDate(int artistId)
+        Sortiert die Alben eines Künstlers nach dem Veröffentlichungsdatum.
+        Parameter: artistId – die ID des Künstlers.
+        Rückgabewert: Eine sortierte Liste von Alben.
+        Fehler: Löst eine Ausnahme aus, wenn der Künstler nicht gefunden wird.
+   
+5. getArtistsWithMostSongsAndAlbums()
+        Berechnet die Gesamtanzahl von Songs und Alben für jeden Künstler und sortiert die Künstler basierend auf der Gesamtzahl.
+        Rückgabewert: Eine Liste von Künstlern, sortiert nach der Gesamtzahl von Songs und Alben.
+   
+6. calculateConcertVIPScore(Listener listener, int concertId)
+        Berechnet eine VIP-Punktzahl für einen Zuhörer basierend auf den Eigenschaften eines Live-Konzerts.
+        Parameter: listener – der Zuhörer, concertId – die ID des Konzerts.
+        Rückgabewert: Eine berechnete Punktzahl, die die VIP-Eignung des Zuhörers bewertet.
+        Fehler: Löst eine Ausnahme aus, wenn das Konzert nicht gefunden wird.
+   
+7. recommend_songs(History userHistory)
+        Empfiehlt dem Benutzer Songs basierend auf seiner Hörhistorie und seinen Lieblingskünstlern.
+        Parameter: userHistory – die Hörhistorie des Benutzers.
+        Rückgabewert: Eine Liste von Songs, die dem Geschmack des Benutzers entsprechen, aber nicht in seiner Historie enthalten sind.
+   
+8. recommend_artists(History userHistory)
+        Empfiehlt Künstler basierend auf den bevorzugten Genres des Benutzers.
+        Parameter: userHistory – die Hörhistorie des Benutzers.
+        Rückgabewert: Eine Liste von Künstlern, die zum bevorzugten Genre des Benutzers gehören.
+   
+9. get_top_genres(History userHistory)
+        Identifiziert die Top-Genres basierend auf der Hörhistorie des Benutzers.
+        Parameter: userHistory – die Hörhistorie des Benutzers.
+        Rückgabewert: Eine Liste der Top 5 Genres nach Häufigkeit, sortiert in absteigender Reihenfolge.
 
-2. Listener (Erbt von User)
-Die Listener-Klasse repräsentiert einen Standardbenutzer, der Musik hört. Zusätzlich zu den geerbten Attributen und Methoden enthält sie eine Liste von Wiedergabelisten (playlists) und eine Methode create_playlist(), um neue Wiedergabelisten zu erstellen.
+InMemory-Repo:
+1. create-Methode
+Fügt eine neue Entität zum Repository hinzu und weist ihr eine eindeutige id zu.
+Die Methode setzt das id-Feld der Entität dynamisch mithilfe von Reflection.
+Fehlerbehandlung: Wirft eine RuntimeException, wenn das id-Feld fehlt oder nicht zugänglich ist.
 
-3. Artist (Erbt von User)
-Die Artist-Klasse erweitert die User-Klasse und repräsentiert Musiker, die Inhalte produzieren. Sie enthält das Attribut albums, um Alben zu speichern, und Methoden wie upload_song() und create_album(), um neue Inhalte hinzuzufügen.
+2. get-Methode
+Ruft eine Entität anhand ihrer eindeutigen id ab.
+Gibt null zurück, wenn keine Entität mit der angegebenen id existiert.
 
-4. Song
-Die Song-Klasse repräsentiert einen einzelnen Titel mit Attributen wie title, duration, artist und album. Sie implementiert die Playable-Schnittstelle und enthält die Methoden play(), pause() und stop() zur Steuerung der Wiedergabe.
+3. read-Methode
+Ruft eine Entität anhand ihrer id ab und überprüft deren Existenz.
+Wirft eine IllegalArgumentException, wenn die Entität nicht gefunden wird.
 
-5. Album
-Die Album-Klasse repräsentiert ein Musikalbum mit Attributen wie title, release_date, artist und einer Liste von songs. Sie hat eine Methode add_song(), um neue Titel zum Album hinzuzufügen.
+4. update-Methode
+Ändert eine bestehende Entität im Repository.
+Greift mithilfe von Reflection auf das id-Feld zu und ersetzt die Entität mit derselben id.
+Fehlerbehandlung:
+Wirft eine RuntimeException, wenn das id-Feld fehlt oder nicht zugänglich ist.
+Wirft eine IllegalArgumentException, wenn keine Entität mit der angegebenen id existiert.
 
-6. Playlist
-Die Playlist-Klasse repräsentiert eine benutzerdefinierte Wiedergabeliste. Sie enthält Attribute wie name, user und songs. Als Playable-Objekt kann sie die Methoden play(), pause() und stop() verwenden. Zusätzlich gibt es Methoden zum Hinzufügen oder Entfernen von Titeln.
+5. delete-Methode
+Entfernt eine Entität aus dem Repository anhand ihrer id.
+Gibt eine Erfolgsmeldung aus, wenn die Entität gelöscht wurde.
+Wirft eine IllegalArgumentException, wenn die Entität nicht gefunden wird.
 
-7. Genre
-Die Genre-Klasse kategorisiert Songs nach Genres. Sie hat ein Attribut name und eine Methode get_songs(), um eine Liste von Songs im jeweiligen Genre zurückzugeben.
+6. getAll-Methode
+Ruft alle im Repository gespeicherten Entitäten ab.
+Gibt eine Map zurück, in der die Schlüssel die ids und die Werte die Entitäten sind.
 
-8. Follow
-Die Follow-Klasse stellt eine Verbindung zwischen einem Listener und einem Artist her, sodass Benutzer ihre Lieblingsmusiker folgen können. Sie stellt die Methode get_followers() zur Verfügung, um die Liste der Follower eines Künstlers abzurufen.
+File-Repo:
+1. create-Methode
+Zweck: Fügt ein neues Entity (Objekt) zum Repository hinzu und speichert es in einer Datei.
+Vorgehensweise:
+Weist dem Entity eine eindeutige id zu, indem der currentId-Zähler erhöht wird.
+Verwendet Reflektion, um die setId-Methode des Entities aufzurufen und die id zu setzen.
+Speichert das Entity im data-Map, wobei die id als Schlüssel verwendet wird.
+Ruft saveDataToFile() auf, um das Repository in der Datei zu speichern.
+Fehlerbehandlung: Wirft eine IllegalArgumentException, wenn das Entity keine setId-Methode hat.
 
-9. Subscription
-Die Subscription-Klasse repräsentiert ein Premium-Abonnement mit Attributen wie type und price. Sie enthält die Methoden upgrade() und cancel(), um Abonnementänderungen zu verwalten.
+2. update-Methode
+Zweck: Aktualisiert ein bereits vorhandenes Entity im Repository.
+Vorgehensweise:
+Extrahiert die id des Entities mithilfe der getId-Methode (mit Reflektion).
+Überprüft, ob ein Entity mit der angegebenen id im Repository vorhanden ist.
+Aktualisiert das Entity im data-Map.
+Ruft saveDataToFile() auf, um das aktualisierte Repository zu speichern.
+Fehlerbehandlung:
+Wirft eine IllegalArgumentException, wenn kein Entity mit der angegebenen id gefunden wird.
+Wirft eine IllegalStateException, wenn das Entity keine getId-Methode hat.
 
-10. History
-Die History-Klasse verfolgt den Wiedergabeverlauf eines Listener und speichert eine Liste von gespielten songs. Sie stellt die Methode add_song_to_history() zur Verfügung, um den Verlauf des Benutzers zu aktualisieren.
+3. delete-Methode
+Zweck: Entfernt ein Entity aus dem Repository anhand seiner id.
+Vorgehensweise:
+Überprüft, ob ein Entity mit der angegebenen id im Repository vorhanden ist.
+Entfernt das Entity aus dem data-Map.
+Ruft saveDataToFile() auf, um die Änderungen zu speichern.
+Fehlerbehandlung: Wirft eine IllegalArgumentException, wenn kein Entity mit der angegebenen id gefunden wird.
 
-11. Playable (Schnittstelle)
-Die Playable-Schnittstelle definiert die Methoden play(), pause() und stop(). Klassen wie Song und Playlist implementieren diese Schnittstelle und erlauben so die Steuerung der Wiedergabe.
+4. read-Methode
+Zweck: Ruft ein Entity anhand seiner id ab.
+Vorgehensweise:
+Sucht das Entity im data-Map anhand der id.
+Gibt das zugehörige Entity zurück oder null, wenn es nicht gefunden wird.
 
-12. LiveConcert
-Die LiveConcert-Klasse repräsentiert ein virtuelles Live-Konzert. Sie umfasst Attribute wie title, date, artist und ticket_count sowie Flags, die angeben, ob Tickets oder Premium-Zugänge erforderlich sind. Methoden wie check_ticket_availability(), check_user_access(), authenticate_for_concert(), start_concert() und end_concert() sowie replay_available() ermöglichen eine Verwaltung und Zugangssteuerung zum Konzert.
-
-13. RecommendationService
-Die RecommendationService-Klasse bietet personalisierte Musikempfehlungen basierend auf der Wiedergabehistorie und den bevorzugten Genres eines Nutzers. Sie enthält Methoden wie get_top_genres(), recommend_artists() und recommend_songs().
 
 #-----------------------------------------------------------------
 
 The application called “MTIFY Music” offers the possibility to listen to the most popular music genres at the highest quality.
 Offers the possibility to participate in live concerts.
-The advantages of a premium account are:
+The advantages of a premium account are: (trebuie refacut)
 -The comments in a live concert are more accessible to the artists;
 -exclusive access to new music albums/tracks;
 -offline listening;
 -Live verse function.
 
-1. User (Abstract Class)
-The User class serves as a base class, representing a generic user within the system. It contains attributes like name and email for storing user details. It has methods login() and logout() to manage user sessions.
+List of functionalities:
+1. sortSongsByTitle(int albumId)
+      Sorts all songs in a specific album alphabetically by their title.
+      Parameters: albumId – the ID of the album.
+      Returns: A sorted list of songs.
+      Error Handling: Throws an exception if the album is not found.
+   
+2. filterAlbumsByGenre(int artistId, String genreName)
+      Filters the albums of a specific artist by genre.
+      Parameters: artistId – the artist's ID, genreName – the name of the genre.
+      Returns: A list of albums matching the genre, or an empty list if the artist is not found.
+   
+3. filterSongsByMinimumDuration(int artistId, float minDuration)
+      Filters the songs of an artist based on a minimum duration.
+      Parameters: artistId – the artist's ID, minDuration – the minimum length of a song in minutes.
+      Returns: A list of songs meeting the duration requirement. Returns an empty list if the artist is not found.
+   
+4. sortAlbumsByReleaseDate(int artistId)
+      Sorts an artist's albums by their release date.
+      Parameters: artistId – the artist's ID.
+      Returns: A sorted list of albums.
+      Error Handling: Throws an exception if the artist is not found.
+   
+5. getArtistsWithMostSongsAndAlbums()
+      Calculates the total number of songs and albums for each artist and sorts the artists based on the total count.
+      Returns: A list of artists sorted by the total number of songs and albums.
+   
+6. calculateConcertVIPScore(Listener listener, int concertId)
+      Calculates a VIP score for a listener based on the attributes of a live concert.
+      Parameters: listener – the listener, concertId – the concert's ID.
+      Returns: A calculated score assessing the listener's VIP eligibility.
+      Error Handling: Throws an exception if the concert is not found.
+   
+7. recommend_songs(History userHistory)
+      Recommends songs to the user based on their listening history and favorite artists.
+      Parameters: userHistory – the user's listening history.
+      Returns: A list of songs matching the user's preferences but not present in their history.
+   
+8. recommend_artists(History userHistory)
+      Recommends artists based on the user's preferred genres.
+      Parameters: userHistory – the user's listening history.
+      Returns: A list of artists belonging to the user's preferred genre.
+   
+9. get_top_genres(History userHistory)
+      Identifies the top genres based on the user's listening history.
+      Parameters: userHistory – the user's listening history.
+      Returns: A list of the top 5 genres by frequency, sorted in descending order.
 
-2. Listener (Inherits from User)
-The Listener class represents a regular user who listens to music. In addition to inheriting attributes and methods from User, it contains a list of playlists (playlists) and has a create_playlist() method for creating new playlists.
+InMemory-Repo:
+1. create Method
+Adds a new entity to the repository and assigns it a unique id.
+The method dynamically sets the id field of the entity using reflection.
+Error Handling: If the id field does not exist or is inaccessible, a RuntimeException is thrown.
 
-3. Artist (Inherits from User)
-The Artist class extends User, representing musicians who produce content. It includes an albums attribute to store albums and provides methods like upload_song() and create_album() to add music content.
+2. get Method
+Retrieves an entity by its unique id.
+Returns null if the entity with the specified id does not exist.
 
-4. Song
-The Song class represents an individual track with attributes such as title, duration, artist, and album. It implements the Playable interface with methods play(), pause(), and stop() for managing song playback.
+3. read Method
+Fetches an entity by its id and validates its existence.
+Throws an IllegalArgumentException if the entity is not found.
 
-5. Album
-The Album class represents a music album, with attributes like title, release_date, artist, and a list of songs. It has an add_song() method to add new songs to the album.
+4. update Method
+Modifies an existing entity in the repository.
+Uses reflection to access the id field and replaces the entity with the same id.
+Error Handling:
+Throws a RuntimeException if the id field is missing or inaccessible.
+Throws an IllegalArgumentException if the entity with the specified id is not found.
 
-6. Playlist
-The Playlist class represents a user-generated playlist of songs. It includes attributes like name, user, and songs. As a Playable object, it can play(), pause(), and stop() playback of the entire playlist. It also has methods to add or remove songs.
+5. delete Method
+Removes an entity from the repository by its id.
+Prints a success message upon deletion.
+Throws an IllegalArgumentException if the entity is not found.
 
-7. Genre
-The Genre class categorizes songs by genre. It has a name attribute and a get_songs() method that returns a list of songs within the genre.
+6. getAll Method
+Retrieves all entities in the repository.
+Returns a map where keys are the entity ids and values are the entities themselves.
+   
+File-Repo:
+1. create Method
+Purpose: Adds a new entity to the repository and persists it in a file.
+Steps:
+Assigns a unique id to the entity using a counter (currentId).
+Uses reflection to dynamically call the entity's setId method and assign the id.
+Stores the entity in the data map using the assigned id as the key.
+Calls saveDataToFile() to persist the updated repository to the file.
+Error Handling: Throws an IllegalArgumentException if the entity lacks a setId method.
 
-8. Follow
-The Follow class establishes a relationship between a Listener and an Artist, enabling fans to follow their favorite musicians. It provides a get_followers() method to retrieve the list of listeners following the artist.
+2. update Method
+Purpose: Updates an existing entity in the repository.
+Steps:
+Extracts the id of the entity using the getId method (via reflection).
+Checks if an entity with the given id exists in the repository.
+Updates the entity in the data map.
+Calls saveDataToFile() to save the updated repository.
+Error Handling:
+Throws an IllegalArgumentException if no entity with the given id exists.
+Throws an IllegalStateException if the entity lacks a getId method.
 
-9. Subscription
-The Subscription class represents a premium account option, with attributes like type and price. It has methods upgrade() and cancel() for managing subscription changes.
+3. delete Method
+Purpose: Removes an entity from the repository based on its id.
+Steps:
+Checks if the repository contains an entity with the specified id.
+Removes the entity from the data map.
+Calls saveDataToFile() to persist the changes.
+Error Handling: Throws an IllegalArgumentException if no entity with the given id exists.
 
-10. History
-The History class tracks the playback history of a Listener, storing a list of songs that have been played. It provides an add_song_to_history() method to update the user’s listening history.
+4. read Method
+Purpose: Retrieves an entity by its id.
+Steps:
+Looks up the id in the data map.
+Returns the corresponding entity, or null if the entity is not found.
 
-11. Playable (Interface)
-The Playable interface defines methods play(), pause(), and stop(). Classes like Song and Playlist implement this interface, allowing these types to be played, paused, or stopped.
-
-12. LiveConcert
-The LiveConcert class represents a virtual live concert event. It includes attributes like title, date, artist, and ticket_count, along with flags indicating if tickets or premium access are required. Methods include check_ticket_availability(), check_user_access(), authenticate_for_concert(), start_concert(), and end_concert(), and it can offer replay_available() for post-event viewing.
-
-13. RecommendationService
-The RecommendationService class provides personalized music suggestions for a listener based on their history and preferred genres. It has methods like get_top_genres(), recommend_artists(), and recommend_songs().
