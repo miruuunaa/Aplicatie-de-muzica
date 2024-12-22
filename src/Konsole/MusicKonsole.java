@@ -104,7 +104,12 @@ public class MusicKonsole {
             System.out.println("22. Attend Concert");
             System.out.println("23. View artist Discography");
             System.out.println("24. Calculate Vip Score");
-            System.out.println("25. Back to Main Menu");
+            System.out.println("25. Filter Albums by Genre");
+            System.out.println("26. Filter Songs by Duration");
+            System.out.println("27. Sort albums by release date");
+            System.out.println("28. Sort songs by title");
+            System.out.println("29. Display artists by total number of songs and albums");
+            System.out.println("30. Back to Main Menu");
             int choice = scanner.nextInt();
             scanner.nextLine();
             switch (choice) {
@@ -179,7 +184,22 @@ public class MusicKonsole {
                     break;
                 case 24:
                     showVIPScore();
+                    break;
                 case 25:
+                    filterAlbumsByGenre();
+                    break;
+                case 26:
+                    filterSongsByDuration();
+                    break;
+                case 27:
+                    sortAlbumsByReleaseDate();
+                    break;
+                case 28:
+                    sortSongsByTitle();
+                    break;
+                case 29:
+                    displayArtistsWithMostSongsAndAlbums();
+                case 30:
                     return;
                 default:
                     System.out.println("Invalid choice. Please try again.");
@@ -204,12 +224,7 @@ public class MusicKonsole {
             System.out.println("8. Validate Album Songs");
             System.out.println("9. View Followers");
             System.out.println("10. View Attendees for Concert");
-            System.out.println("11. Filter Albums by Genre");
-            System.out.println("12. Filter Songs by Duration");
-            System.out.println("13. Sort albums by release date");
-            System.out.println("14. Sort songs by title");
-            System.out.println("15. Display artists by total number of songs and albums");
-            System.out.println("16. Back to Main Menu");
+            System.out.println("11. Back to Main Menu");
             int choice = scanner.nextInt();
             scanner.nextLine();
             switch (choice) {
@@ -244,20 +259,6 @@ public class MusicKonsole {
                     viewAttendeesForConcert();
                     break;
                 case 11:
-                    filterAlbumsByGenre();
-                    break;
-                case 12:
-                    filterSongsByDuration();
-                    break;
-                case 13:
-                    sortAlbumsByReleaseDate();
-                    break;
-                case 14:
-                    sortSongsByTitle();
-                    break;
-                case 15:
-                    displayArtistsWithMostSongsAndAlbums();
-                case 16:
                     return;
                 default:
                     System.out.println("Invalid choice. Please try again.");
