@@ -2,6 +2,7 @@ package Service;
 import Domain.Album;
 import Domain.Artist;
 import Domain.Song;
+import Exceptions.DatabaseException;
 import Repository.IRepository;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -34,12 +35,17 @@ public class AlbumService {
      * Retrieves a list of all available albums in the repository.
      *
      * @return A list of all albums in the repository.
+     * @throws EntityNotFoundException if no albums are found.
      */
     public List<Album> getAvailableAlbums() {
-        if (albumRepository.getAll().isEmpty()) {
-            throw new EntityNotFoundException("No albums available in the repository.");
+        try {
+            if (albumRepository.getAll().isEmpty()) {
+                throw new EntityNotFoundException("No albums available in the repository.");
+            }
+            return new ArrayList<>(albumRepository.getAll().values());
+        }catch(DatabaseException e){
+            throw new DatabaseException("Database error while retrieving available albums: " + e.getMessage());
         }
-        return new ArrayList<>(albumRepository.getAll().values());
     }
 
     /**
@@ -47,6 +53,7 @@ public class AlbumService {
      *
      * @param album The album from which to retrieve the list of songs.
      * @return A list of songs contained in the specified album.
+     * @throws ValidationException if the album is null.
      */
     public List<Song> getSongsInAlbum(Album album) {
         if (album == null) {
@@ -61,6 +68,8 @@ public class AlbumService {
      *
      * @param album The album from which the song will be removed.
      * @param song  The song to be removed from the album.
+     * @throws ValidationException      if album or song is null.
+     * @throws EntityNotFoundException if the song is not found in the album.
      */
     public void removeSongFromAlbum(Album album, Song song) {
         if (album == null) {
@@ -72,11 +81,15 @@ public class AlbumService {
         if (!album.getSongs().contains(song)) {
             throw new EntityNotFoundException("Song '" + song.getTitle() + "' not found in album '" + album.getTitle() + "'.");
         }
+        try{
+            album.getSongs().remove(song);
+            System.out.println(song.getTitle() + " removed from album " + album.getTitle() + ".");
+        }catch(Exception e){
+            throw new BusinessLogicException("Failed to remove song from album: " + e.getMessage());
+        }
 
-        album.getSongs().remove(song);
-        System.out.println(song.getTitle() + " removed from album " + album.getTitle() + ".");
+
     }
-
 
     /**
      * Validates if the album exceeds the maximum allowed number of songs.
@@ -84,6 +97,8 @@ public class AlbumService {
      * @param album   The album to validate.
      * @param maxSongs The maximum allowed number of songs in the album.
      * @return true if the album contains fewer or equal to the maximum number of songs, false otherwise.
+     * @throws ValidationException      if the album is null or maxSongs is invalid.
+     * @throws BusinessLogicException if the album exceeds the maximum number of songs.
      */
     public boolean validateAlbumSongs(Album album, int maxSongs) {
         if (album == null) {
@@ -105,12 +120,18 @@ public class AlbumService {
      * Adds a new album to the repository.
      *
      * @param album The album to be added to the repository.
+     * @throws ValidationException  if the album is null.
+     * @throws DatabaseException if a database error occurs while adding the album.
      */
     public void addAlbum(Album album) {
         if (album == null) {
             throw new ValidationException("Album cannot be null.");
         }
-        albumRepository.create(album);
+        try {
+            albumRepository.create(album);
+        }catch (Exception e){
+            throw new DatabaseException("Failed to add album to the repository: " + e.getMessage());
+        }
     }
 
     /**
@@ -118,36 +139,45 @@ public class AlbumService {
      *
      * @param albumName The name of the album to retrieve.
      * @return The album with the specified name, or null if no album is found.
+     * @throws ValidationException      if the album name is invalid.
+     * @throws EntityNotFoundException if the album is not found.
      */
     public Album getAlbumByName(String albumName) {
         if (albumName == null || albumName.isEmpty()) {
             throw new ValidationException("Album name cannot be null or empty.");
         }
-
-        for (Album album : albumRepository.getAll().values()) {
-            if (album.getTitle().equalsIgnoreCase(albumName)) {
-                return album;
+        try {
+            for (Album album : albumRepository.getAll().values()) {
+                if (album.getTitle().equalsIgnoreCase(albumName)) {
+                    return album;
+                }
             }
+            throw new EntityNotFoundException("Album with name '" + albumName + "' not found.");
+        }catch (DatabaseException e){
+            throw new DatabaseException("Database error while retrieving album by name: " + e.getMessage());
         }
-
-        throw new EntityNotFoundException("Album with name '" + albumName + "' not found.");
     }
-
 
     /**
      * Sort songs of an album by the title
      *
      * @param albumId id of the album
      * @return list of songs sorted by the title
+     * @throws EntityNotFoundException if the album is not found.
+     * @throws DatabaseException if a database error occurs while retrieving the album.
      */
     public List<Song> sortSongsByTitle(int albumId) {
-        Album album = albumRepository.get(albumId);
-        if (album == null) {
-            throw new EntityNotFoundException("Album with ID '" + albumId + "' not found.");
+        try {
+            Album album = albumRepository.get(albumId);
+            if (album == null) {
+                throw new EntityNotFoundException("Album with ID '" + albumId + "' not found.");
+            }
+            return album.getSongs().stream()
+                    .sorted(Comparator.comparing(Song::getTitle))
+                    .collect(Collectors.toList());
+        }catch (DatabaseException e){
+            throw new DatabaseException("Database error while retrieving album for sorting: " + e.getMessage());
         }
-        return album.getSongs().stream()
-                .sorted(Comparator.comparing(Song::getTitle))
-                .collect(Collectors.toList());
     }
 
 

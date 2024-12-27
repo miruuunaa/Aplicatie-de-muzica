@@ -1,5 +1,6 @@
 package Service;
 import Domain.Genre;
+import Exceptions.DatabaseException;
 import Repository.IRepository;
 
 import java.util.ArrayList;
@@ -23,14 +24,19 @@ public class GenreService {
      *
      * @return A list of all genres available in the repository.
      * @throws EntityNotFoundException if no genres are found in the repository.
+     * @throws DatabaseException if there is an error accessing the repository.
      */
     public List<Genre> getAllGenres() {
-        List<Genre> genres = new ArrayList<>(genreRepository.getAll().values());
+        try {
+            List<Genre> genres = new ArrayList<>(genreRepository.getAll().values());
 
-        if (genres.isEmpty()) {
-            throw new EntityNotFoundException("No genres found in the repository.");
+            if (genres.isEmpty()) {
+                throw new EntityNotFoundException("No genres found in the repository.");
+            }
+
+            return genres;
+        }catch (DatabaseException e){
+            throw new DatabaseException("Error while retrieving genres from the repository: " + e.getMessage());
         }
-
-        return genres;
     }
 }

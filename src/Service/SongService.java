@@ -57,13 +57,15 @@ public class SongService {
      * The song is stored in the repository for later retrieval and management.
      *
      * @param song The song to be added.
-     * @throws ValidationException if the song is null.
+     * @throws ValidationException if the song is null or already exists in the repository.
      */
     public void addSong(Song song) {
         if (song == null) {
             throw new ValidationException("Song cannot be null.");
         }
-
+        if (songRepository.getAll().values().stream().anyMatch(existingSong -> existingSong.getTitle().equalsIgnoreCase(song.getTitle()))) {
+            throw new ValidationException("A song with the same title already exists in the repository.");
+        }
         songRepository.create(song);
     }
 

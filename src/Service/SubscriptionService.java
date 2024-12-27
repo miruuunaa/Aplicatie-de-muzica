@@ -66,6 +66,7 @@ public class SubscriptionService {
                 if (currentType.equals("basic")) {
                     currentSubscription.setType("premium");
                     currentSubscription.setPrice(PREMIUM_PRICE);
+                    subscriptionRepository.update(currentSubscription);
                     System.out.println("Subscription upgraded to Premium at price " + PREMIUM_PRICE + ".");
                 } else {
                     throw new BusinessLogicException("Invalid upgrade. You cannot upgrade to the requested type.");
@@ -75,6 +76,7 @@ public class SubscriptionService {
                 if (currentType.equals("premium")) {
                     currentSubscription.setType("basic");
                     currentSubscription.setPrice(BASIC_PRICE);
+                    subscriptionRepository.update(currentSubscription);
                     System.out.println("Subscription downgraded to Basic at price " + BASIC_PRICE + ".");
                 } else {
                     throw new BusinessLogicException("Invalid downgrade. You cannot downgrade to the requested type.");

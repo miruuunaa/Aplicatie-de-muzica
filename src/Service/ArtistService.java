@@ -4,6 +4,8 @@ import Domain.Album;
 import Domain.Artist;
 import Domain.Listener;
 import Domain.Song;
+import Exceptions.BusinessLogicException;
+import Exceptions.DatabaseException;
 import Repository.IRepository;
 
 import java.util.*;
@@ -33,12 +35,18 @@ public class ArtistService {
      * Adds a new artist to the repository.
      *
      * @param artist The artist to be added to the repository.
+     * @throws ValidationException if the artist is null.
+     * @throws DatabaseException if there is an error adding the artist to the repository.
      */
     public void addArtist(Artist artist) {
         if (artist == null) {
             throw new ValidationException("Artist cannot be null.");
         }
-        artistRepository.create(artist);
+        try {
+            artistRepository.create(artist);
+        }catch (Exception e){
+            throw new DatabaseException("Failed to add artist to the repository: " + e.getMessage());
+        }
     }
 
     /**
@@ -46,6 +54,8 @@ public class ArtistService {
      *
      * @param listener The listener who will follow the artist.
      * @param artist The artist to be followed by the listener.
+     * @throws ValidationException if the listener is null.
+     * @throws EntityNotFoundException if the artist is null or not found.
      */
     public void enrollListenerToArtist(Listener listener, Artist artist) {
         if (listener == null) {
@@ -54,7 +64,11 @@ public class ArtistService {
         if (artist == null) {
             throw new EntityNotFoundException("Artist not found.");
         }
-        artist.getFollowers().add(listener);
+        try {
+            artist.getFollowers().add(listener);
+        }catch (Exception e){
+            throw new BusinessLogicException("Failed to enroll listener to artist: " + e.getMessage());
+        }
     }
 
     /**
@@ -62,22 +76,21 @@ public class ArtistService {
      *
      * @param name The name of the artist to retrieve.
      * @return The artist with the specified name, or throws an exception if no artist is found.
+     * @throws ValidationException if the artist name is null or empty.
+     * @throws EntityNotFoundException if the artist is not found.
      */
     public Artist getArtistByName(String name) {
         if (name == null || name.isEmpty()) {
             throw new ValidationException("Artist name cannot be null or empty.");
         }
-
-        Artist artist = artistRepository.getAll().values().stream()
-                .filter(a -> a.getName().equalsIgnoreCase(name))
-                .findFirst()
-                .orElse(null);
-
-        if (artist == null) {
-            throw new EntityNotFoundException("Artist with name '" + name + "' not found.");
+        try {
+            return artistRepository.getAll().values().stream()
+                    .filter(a -> a.getName().equalsIgnoreCase(name))
+                    .findFirst()
+                    .orElseThrow(() -> new EntityNotFoundException("Artist with name '" + name + "' not found."));
+        }catch (DatabaseException e){
+            throw new DatabaseException("Database error while retrieving artist by name: " + e.getMessage());
         }
-
-        return artist;
     }
 
     /**
@@ -85,23 +98,23 @@ public class ArtistService {
      * This includes all albums and their respective songs.
      *
      * @param artistName The name of the artist whose discography will be displayed.
+     * @throws ValidationException if the artist name is null or empty.
+     * @throws EntityNotFoundException if the artist is not found.
      */
     public void showDiscography(String artistName) {
         if (artistName == null || artistName.isEmpty()) {
             throw new ValidationException("Artist name cannot be null or empty.");
         }
-
-        Artist artist = artistRepository.getAll().values()
-                .stream()
-                .filter(a -> a.getName().equalsIgnoreCase(artistName))
-                .findFirst()
-                .orElse(null);
-
-        if (artist == null) {
-            System.out.println("Artist not found.");
-            return;
+        Artist artist;
+        try {
+            artist = artistRepository.getAll().values()
+                    .stream()
+                    .filter(a -> a.getName().equalsIgnoreCase(artistName))
+                    .findFirst()
+                    .orElseThrow(()-> new EntityNotFoundException("Artist with name '" + artistName + "' not found."));
+        }catch(DatabaseException e){
+            throw new DatabaseException("Database error while retrieving artist discography: " + e.getMessage());
         }
-
         List<Album> albums = artist.getAlbums();
         if (albums.isEmpty()) {
             System.out.println("No albums found for this artist.");
@@ -122,6 +135,8 @@ public class ArtistService {
      * @param artistId The ID of the artist.
      * @param genreName The genre name to filter albums by.
      * @return List of albums matching the genre.
+     * @throws ValidationException if the genre name is null or empty.
+     * @throws EntityNotFoundException if the artist is not found.
      */
     public List<Album> filterAlbumsByGenre(int artistId, String genreName) {
         if (genreName == null || genreName.isEmpty()) {
@@ -144,6 +159,8 @@ public class ArtistService {
      * @param artistId The ID of the artist.
      * @param minDuration Minimum duration of the songs to be returned.
      * @return List of songs with duration greater than or equal to minDuration.
+     * @throws ValidationException if the minimum duration is invalid.
+     * @throws EntityNotFoundException if the artist is not found.
      */
     public List<Song> filterSongsByMinimumDuration(int artistId, float minDuration) {
         if (minDuration <= 0) {
@@ -166,6 +183,7 @@ public class ArtistService {
      *
      * @param artistId the id of the artist
      * @return list of sorted albums by the release date
+     * @throws EntityNotFoundException if the artist is not found.
      */
     public List<Album> sortAlbumsByReleaseDate(int artistId) {
         Artist artist = artistRepository.get(artistId);
@@ -176,25 +194,31 @@ public class ArtistService {
                 .sorted(Comparator.comparing(Album::getReleaseDate))
                 .collect(Collectors.toList());
     }
+
     /**
      * Calculates the total number of songs for each artist and sorts them by the number of songs.
      * It also considers the total number of albums for each artist.
      *
      * @return List of artists sorted by the total number of songs and albums.
+     * @throws DatabaseException if a database error occurs while retrieving the data.
      */
     public List<Artist> getArtistsWithMostSongsAndAlbums() {
-        Map<Artist, Integer> artistSongCountMap = new HashMap<>();
-        for (Artist artist : artistRepository.getAll().values()) {
-            int totalSongs = artist.getAlbums().stream()
-                    .mapToInt(album -> album.getSongs().size())
-                    .sum();
-            artistSongCountMap.put(artist, totalSongs);
-        }
+        try {
+            Map<Artist, Integer> artistSongCountMap = new HashMap<>();
+            for (Artist artist : artistRepository.getAll().values()) {
+                int totalSongs = artist.getAlbums().stream()
+                        .mapToInt(album -> album.getSongs().size())
+                        .sum();
+                artistSongCountMap.put(artist, totalSongs);
+            }
 
-        return artistSongCountMap.entrySet().stream()
-                .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+            return artistSongCountMap.entrySet().stream()
+                    .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+        }catch (DatabaseException e){
+            throw new DatabaseException("Database error while calculating artists with most songs and albums: " + e.getMessage());
+        }
     }
 
 }

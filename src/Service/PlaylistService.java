@@ -33,6 +33,7 @@ public class PlaylistService {
      * @param playlist The playlist to which the song will be added.
      * @param song The song to be added to the playlist.
      * @throws EntityNotFoundException if the playlist or song is not found.
+     * @throws ValidationException if the playlist already contains the song.
      */
     public void addSongToPlaylist(Playlist playlist, Song song) {
         if (playlist == null) {
@@ -41,7 +42,9 @@ public class PlaylistService {
         if (song == null) {
             throw new EntityNotFoundException("Song not found.");
         }
-
+        if (playlist.getSongs().contains(song)) {
+            throw new ValidationException("The song is already in the playlist.");
+        }
         playlist.addSong(song);
     }
 
@@ -52,6 +55,7 @@ public class PlaylistService {
      * @param playlist The playlist from which the song will be removed.
      * @param song The song to be removed from the playlist.
      * @throws EntityNotFoundException if the playlist or song is not found.
+     * @throws ValidationException if the song is not present in the playlist.
      */
     public void removeSongFromPlaylist(Playlist playlist, Song song) {
         if (playlist == null) {
@@ -60,11 +64,11 @@ public class PlaylistService {
         if (song == null) {
             throw new EntityNotFoundException("Song not found.");
         }
-
+        if (!playlist.getSongs().contains(song)) {
+            throw new ValidationException("The song is not in the playlist.");
+        }
         if (playlist.removeSong(song)) {
             System.out.println(song.getTitle() + " removed from playlist.");
-        } else {
-            System.out.println("Song not found in playlist.");
         }
     }
 
@@ -73,12 +77,15 @@ public class PlaylistService {
      *
      * @param playlist The playlist to be played.
      * @throws EntityNotFoundException if the playlist is not found.
+     * @throws ValidationException if the playlist is empty.
      */
     public void playPlaylist(Playlist playlist) {
         if (playlist == null) {
             throw new EntityNotFoundException("Playlist not found.");
         }
-
+        if (playlist.getSongs().isEmpty()) {
+            throw new ValidationException("Cannot play an empty playlist.");
+        }
         playlist.play();
     }
 
@@ -106,7 +113,6 @@ public class PlaylistService {
         if (playlist == null) {
             throw new EntityNotFoundException("Playlist not found.");
         }
-
         playlist.pause();
     }
 
@@ -114,13 +120,15 @@ public class PlaylistService {
      * Adds a playlist to the repository.
      *
      * @param playlist The playlist to be added to the repository.
-     * @throws ValidationException if the playlist is null.
+     * @throws ValidationException if the playlist is null or already exists in the repository.
      */
     public void addPlaylist(Playlist playlist) {
         if (playlist == null) {
             throw new ValidationException("Playlist cannot be null.");
         }
-
+        if (playlistRepository.getAll().values().stream().anyMatch(p -> p.getName().equalsIgnoreCase(playlist.getName()))) {
+            throw new ValidationException("A playlist with the same name already exists.");
+        }
         playlistRepository.create(playlist);
     }
 
@@ -131,6 +139,7 @@ public class PlaylistService {
      * @param name The name of the playlist to retrieve.
      * @return The playlist with the specified name, or throws EntityNotFoundException if no playlist is found.
      * @throws EntityNotFoundException if no playlist with the specified name is found.
+     * @throws ValidationException if the name is null or empty.
      */
     public Playlist getPlaylistByName(String name) {
         if (name == null || name.trim().isEmpty()) {

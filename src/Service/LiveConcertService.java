@@ -2,6 +2,7 @@ package Service;
 import Domain.Artist;
 import Domain.LiveConcert;
 import Domain.Listener;
+import Exceptions.DatabaseException;
 import Repository.IRepository;
 
 import java.util.ArrayList;
@@ -36,73 +37,84 @@ public class LiveConcertService {
      *
      * @param concertTitle The title of the concert to retrieve.
      * @return The concert with the specified title, or null if no concert is found.
+     * @throws ValidationException if the title is null or empty.
      * @throws EntityNotFoundException if no concert with the specified title is found.
+     * @throws DatabaseException if an error occurs while accessing the repository.
      */
     public LiveConcert getConcertByTitle(String concertTitle) {
         if (concertTitle == null || concertTitle.trim().isEmpty()) {
             throw new ValidationException("Concert title cannot be null or empty.");
         }
+        try {
+            LiveConcert concert = concertRepository.getAll().values().stream()
+                    .filter(c -> c.getTitle().equalsIgnoreCase(concertTitle))
+                    .findFirst()
+                    .orElse(null);
 
-        LiveConcert concert = concertRepository.getAll().values().stream()
-                .filter(c -> c.getTitle().equalsIgnoreCase(concertTitle))
-                .findFirst()
-                .orElse(null);
+            if (concert == null) {
+                throw new EntityNotFoundException("Concert with title " + concertTitle + " not found.");
+            }
 
-        if (concert == null) {
-            throw new EntityNotFoundException("Concert with title " + concertTitle + " not found.");
+            return concert;
+        }catch (Exception e){
+            throw new DatabaseException("Error while retrieving concert by title: " + e.getMessage());
         }
-
-        return concert;
     }
 
     /**
      * Starts a concert by changing its status to started.
      *
      * @param concertTitle The title of the concert to start.
+     * @throws ValidationException if the title is null or empty.
      * @throws EntityNotFoundException if the concert is not found.
+     * @throws DatabaseException if an error occurs while accessing the repository.
      */
     public void startConcert(String concertTitle) {
         if (concertTitle == null || concertTitle.trim().isEmpty()) {
             throw new ValidationException("Concert title cannot be null or empty.");
         }
+        try {
+            LiveConcert concert = getAvailableConcerts()
+                    .stream()
+                    .filter(c -> c.getTitle().equalsIgnoreCase(concertTitle))
+                    .findFirst()
+                    .orElse(null);
 
-        LiveConcert concert = getAvailableConcerts()
-                .stream()
-                .filter(c -> c.getTitle().equalsIgnoreCase(concertTitle))
-                .findFirst()
-                .orElse(null);
+            if (concert == null) {
+                throw new EntityNotFoundException("Concert not found.");
+            }
 
-        if (concert == null) {
-            throw new EntityNotFoundException("Concert not found.");
+            concert.setStarted(true);
+            System.out.println("The Concert " + concert.getTitle() + " has started.");
+        }catch (Exception e){
+            throw new DatabaseException("Error while starting concert: " + e.getMessage());
         }
-
-        concert.setStarted(true);
-        System.out.println("The Concert " + concert.getTitle() + " has started.");
     }
 
     /**
      * Ends a concert by changing its status to ended.
      *
      * @param concertTitle The title of the concert to end.
-     * @throws EntityNotFoundException if the concert is not found.
+     *  @throws ValidationException if the title is null or empty.
+     *  @throws EntityNotFoundException if the concert is not found.
+     *  @throws DatabaseException if an error occurs while accessing the repository.
      */
     public void endConcert(String concertTitle) {
         if (concertTitle == null || concertTitle.trim().isEmpty()) {
             throw new ValidationException("Concert title cannot be null or empty.");
         }
+        try {
+            LiveConcert concert = getConcertByTitle(concertTitle);
 
-        LiveConcert concert = getAvailableConcerts()
-                .stream()
-                .filter(c -> c.getTitle().equalsIgnoreCase(concertTitle))
-                .findFirst()
-                .orElse(null);
+            if (concert.isEnded()) {
+                throw new ValidationException("Concert has already ended.");
+            }
 
-        if (concert == null) {
-            throw new EntityNotFoundException("Concert not found.");
+            concert.setEnded(true);
+            System.out.println("The Concert " + concert.getTitle() + " has ended.");
+        }catch (Exception e){
+            throw new DatabaseException("Error while ending concert: " + e.getMessage());
         }
-
-        concert.setEnded(true);
-        System.out.println("The Concert " + concert.getTitle() + " has ended.");
     }
 
     /**
@@ -110,23 +122,14 @@ public class LiveConcertService {
      *
      * @param concertTitle The title of the concert to check ticket availability.
      * @return true if tickets are available, false otherwise.
+     * @throws ValidationException if the title is null or empty.
      * @throws EntityNotFoundException if the concert is not found.
      */
     public boolean checkTicketAvailability(String concertTitle) {
         if (concertTitle == null || concertTitle.trim().isEmpty()) {
             throw new ValidationException("Concert title cannot be null or empty.");
         }
-
-        LiveConcert concert = getAvailableConcerts()
-                .stream()
-                .filter(c -> c.getTitle().equalsIgnoreCase(concertTitle))
-                .findFirst()
-                .orElse(null);
-
-        if (concert == null) {
-            throw new EntityNotFoundException("Concert not found.");
-        }
-
+        LiveConcert concert = getConcertByTitle(concertTitle);
         return concert.getAvailableSeats() > 0;
     }
 
@@ -181,9 +184,12 @@ public class LiveConcertService {
      * Displays the list of attendees for a given concert by its title, categorized into early access and regular access attendees.
      *
      * @param concertTitle The title of the concert for which the attendees are being displayed.
-     * @throws EntityNotFoundException if the concert is not found.
+     * @throws ValidationException if the concert is not found.
      */
     public void showAttendees(String concertTitle) {
+        if (concertTitle == null || concertTitle.trim().isEmpty()) {
+            throw new ValidationException("Concert title cannot be null or empty.");
+        }
         LiveConcert concert = getConcertByTitle(concertTitle);
 
         List<Listener> earlyAccessList = concert.getEarlyAccessList();
@@ -209,9 +215,13 @@ public class LiveConcertService {
      * @param listener The listener for whom to calculate the score.
      * @param concertId The ID of the concert.
      * @return The calculated VIP score.
+     * @throws ValidationException if the listener is null.
      * @throws EntityNotFoundException if the concert is not found.
      */
     public double calculateConcertVIPScore(Listener listener, int concertId) {
+        if (listener == null) {
+            throw new ValidationException("Listener cannot be null.");
+        }
         LiveConcert concert = concertRepository.get(concertId);
         if (concert == null) {
             throw new EntityNotFoundException("Concert not found.");
@@ -238,11 +248,16 @@ public class LiveConcertService {
      * Adds a new concert to the repository.
      *
      * @param concert The concert to be added.
+     * @throws ValidationException if the concert is null.
      */
     public void addConcert(LiveConcert concert) {
         if (concert == null) {
             throw new ValidationException("Concert cannot be null.");
         }
-        concertRepository.create(concert);
+        try {
+            concertRepository.create(concert);
+        } catch (Exception e) {
+            throw new DatabaseException("Error while adding concert: " + e.getMessage());
+        }
     }
 }
