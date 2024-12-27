@@ -121,6 +121,46 @@ Vorgehensweise:
 Sucht das Entity im data-Map anhand der id.
 Gibt das zugehörige Entity zurück oder null, wenn es nicht gefunden wird.
 
+Database-Repo:
+1. create Methode
+Zweck: Fügt eine neue Entität zum Repository hinzu und speichert sie in der Datenbank.
+Schritte:
+Erstellt eine INSERT SQL-Abfrage, um die Entität hinzuzufügen.
+Verwendet PreparedStatement, um die Werte (z.B.(Album) Titel, Veröffentlichungsdatum, Künstler, Genre) in die Abfrage einzufügen.
+Führt die Abfrage aus, um die Entität in der Datenbank zu speichern.
+Fehlerbehandlung: Wirft eine RuntimeException, wenn ein SQL-Fehler auftritt.
+
+2. read Methode
+Zweck: Ruft eine Entität aus der Datenbank anhand ihrer ID ab.
+Schritte:
+Erstellt eine SELECT SQL-Abfrage, um die Entität mit der angegebenen ID abzurufen.
+Führt die Abfrage aus und extrahiert die Daten mithilfe eines ResultSet.
+Gibt die entsprechende Entität zurück, wenn sie gefunden wird, oder null, wenn sie nicht vorhanden ist.
+Fehlerbehandlung: Wirft eine RuntimeException, wenn ein SQL-Fehler auftritt.
+
+3. update Methode
+Zweck: Aktualisiert eine bestehende Entität im Repository.
+Schritte:
+Erstellt eine UPDATE SQL-Abfrage, um die Details der Entität zu ändern.
+Verwendet PreparedStatement, um die neuen Werte (z.B. Titel, Veröffentlichungsdatum, Künstler, Genre) festzulegen.
+Führt die Abfrage aus, um die Entität in der Datenbank zu aktualisieren.
+Fehlerbehandlung: Wirft eine RuntimeException, wenn ein SQL-Fehler auftritt.
+
+4. delete Methode
+Zweck: Löscht eine Entität aus der Datenbank anhand ihrer ID.
+Schritte:
+Erstellt eine DELETE SQL-Abfrage, um die Entität mit der angegebenen ID zu entfernen.
+Führt die Abfrage aus, um die Entität aus der Datenbank zu löschen.
+Fehlerbehandlung: Wirft eine RuntimeException, wenn ein SQL-Fehler auftritt.
+
+5. getAll Methode
+Zweck: Ruft alle Entitäten aus der Datenbank ab.
+Schritte:
+Erstellt eine SELECT * SQL-Abfrage, um alle Entitäten abzurufen.
+Führt die Abfrage aus und iteriert über das Ergebnis, um alle Entitäten zu extrahieren.
+Gibt eine Liste aller Entitäten zurück.
+Fehlerbehandlung: Wirft eine RuntimeException, wenn ein SQL-Fehler auftritt.
+
 
 #-----------------------------------------------------------------
 
@@ -244,4 +284,44 @@ Purpose: Retrieves an entity by its id.
 Steps:
 Looks up the id in the data map.
 Returns the corresponding entity, or null if the entity is not found.
+
+Database-Repo:
+1. create Method
+Purpose: Adds a new entity to the repository and persists it in the database.
+Steps:
+Constructs an INSERT SQL query to insert the entity's details.
+Uses PreparedStatement to set the values (e.g., title, release date, artist, genre) into the query.
+Executes the query to add the entity to the database.
+Error Handling: Throws a RuntimeException if there is an SQL error.
+
+2. read Method
+Purpose: Retrieves an entity from the database based on its ID.
+Steps:
+Constructs a SELECT SQL query to fetch the entity with the given ID.
+Executes the query and extracts the data using a ResultSet.
+Returns the corresponding entity if found, or null if not.
+Error Handling: Throws a RuntimeException if there is an SQL error.
+
+3. update Method
+Purpose: Updates an existing entity in the repository.
+Steps:
+Constructs an UPDATE SQL query to modify the entity's details.
+Uses PreparedStatement to set the new values (e.g.(Album), title, release date, artist, genre).
+Executes the query to update the entity in the database.
+Error Handling: Throws a RuntimeException if there is an SQL error.
+
+4. delete Method
+Purpose: Deletes an entity from the database based on its ID.
+Steps:
+Constructs a DELETE SQL query to remove the entity with the given ID.
+Executes the query to delete the entity from the database.
+Error Handling: Throws a RuntimeException if there is an SQL error.
+
+5. getAll Method
+Purpose: Retrieves all entities from the database.
+Steps:
+Constructs a SELECT * SQL query to fetch all entities.
+Executes the query and iterates over the result set to extract all entities.
+Returns the list of all entities.
+Error Handling: Throws a RuntimeException if there is an SQL error.
 
