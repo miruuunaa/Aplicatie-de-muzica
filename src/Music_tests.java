@@ -1,4 +1,5 @@
 import Domain.*;
+import Exceptions.EntityNotFoundException;
 import Service.*;
 import Repository.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,7 +67,7 @@ public class Music_tests {
         Listener listener = new Listener("John Doe", "john@example.com");
         listener.setSubscription(new Subscription("Premium", 30.0f, listener));
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
                 () -> concertService.calculateConcertVIPScore(listener, 999),
                 "Exception should be thrown when concert is not found.");
         assertEquals("Concert not found.", exception.getMessage());
@@ -95,8 +96,12 @@ public class Music_tests {
 
     @Test
     public void testFilterAlbumsByGenre_ArtistNotFound() {
-        List<Album> filteredAlbums = artistService.filterAlbumsByGenre(999, "Pop");
-        assertTrue(filteredAlbums.isEmpty(), "No albums should be returned if artist is not found.");
+        int artistId = 999;
+        String genre = "Pop";
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> artistService.filterAlbumsByGenre(artistId, genre),
+                "Exception should be thrown when artist is not found.");
+        assertEquals("Artist with ID '" + artistId + "' not found.", exception.getMessage());
     }
 
     @Test
@@ -124,8 +129,11 @@ public class Music_tests {
 
     @Test
     public void testFilterSongsByMinimumDuration_ArtistNotFound() {
-        List<Song> filteredSongs = artistService.filterSongsByMinimumDuration(999, 3.0f);
-        assertTrue(filteredSongs.isEmpty(), "No songs should be returned if artist is not found.");
+        int artistId = 999;
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> artistService.filterSongsByMinimumDuration(artistId, 3.0f),
+                "Exception should be thrown when artist is not found.");
+        assertEquals("Artist with ID '" + artistId + "' not found.", exception.getMessage());
     }
 
     @Test
@@ -146,10 +154,11 @@ public class Music_tests {
 
     @Test
     public void testSortAlbumsByReleaseDate_ArtistNotFound() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> artistService.sortAlbumsByReleaseDate(999),
+        int artistId=999;
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> artistService.sortAlbumsByReleaseDate(artistId),
                 "Exception should be thrown when artist is not found.");
-        assertEquals("Artist not found.", exception.getMessage());
+        assertEquals("Artist with ID '" + artistId + "' not found.", exception.getMessage());
     }
 
     @Test
@@ -171,9 +180,10 @@ public class Music_tests {
 
     @Test
     public void testSortSongsByTitle_AlbumNotFound() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> albumService.sortSongsByTitle(999),
+        int albumId=999;
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> albumService.sortSongsByTitle(albumId),
                 "Exception should be thrown when album is not found.");
-        assertEquals("Album not found.", exception.getMessage());
+        assertEquals("Album with ID '" + albumId + "' not found.", exception.getMessage());
     }
 }
