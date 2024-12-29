@@ -12,6 +12,8 @@ import java.util.Set;
 import Exceptions.EntityNotFoundException;
 import Exceptions.ValidationException;
 
+import static org.junit.jupiter.params.shadow.com.univocity.parsers.conversions.Conversions.toLowerCase;
+
 /**The MusicKonsole class represents the console interface for the MTIFY Music application.
  * It interacts with the user to allow listeners and artists to manage their accounts, playlists, and concerts.
  * It provides a menu-driven system for navigation between different functionalities.*/
@@ -224,7 +226,11 @@ public class MusicKonsole {
             System.out.println("8. Validate Album Songs");
             System.out.println("9. View Followers");
             System.out.println("10. View Attendees for Concert");
-            System.out.println("11. Back to Main Menu");
+            System.out.println("11. Delete Album");
+            System.out.println("12. Update Album Details");
+            System.out.println("13. Delete Song");
+            System.out.println("14. Update Song Details");
+            System.out.println("15. Back to Main Menu");
             int choice = scanner.nextInt();
             scanner.nextLine();
             switch (choice) {
@@ -259,6 +265,17 @@ public class MusicKonsole {
                     viewAttendeesForConcert();
                     break;
                 case 11:
+                    deleteAlbum();
+                    break;
+                case 12:
+                    updateAlbumDetails();
+                    break;
+                case 13:
+                    deleteSong();
+                    break;
+                case 14:
+                    updateSongDetails();
+                case 15:
                     return;
                 default:
                     System.out.println("Invalid choice. Please try again.");
@@ -267,8 +284,8 @@ public class MusicKonsole {
     }
 
     /**
-     * Attempts to authenticate as a listener by prompting for a username.
-     * If a valid listener is found, logs them in and returns the Listener object.
+     * Attempts to authenticate as a listener by prompting for a username and password.
+     * If a valid listener is found and the password is correct, logs them in and returns the Listener object.
      *
      * @return the logged-in Listener object if successful, null otherwise.
      */
@@ -276,12 +293,18 @@ public class MusicKonsole {
         System.out.println("Enter Listener username:");
         String username = scanner.nextLine();
         Listener listener = musicController.getListenerByName(username);
-
         if (listener != null) {
-            currentListener = listener;
-            musicController.setCurrentListener(listener);
-            listener.login();
-            return listener;
+            System.out.println("Enter password:");
+            String inputPassword = scanner.nextLine();
+            if (listener.authenticate(inputPassword)) {
+                currentListener = listener;
+                musicController.setCurrentListener(listener);
+                System.out.println("Login successful!");
+                return listener;
+            } else {
+                System.out.println("Incorrect password. Please try again.");
+                return null;
+            }
         } else {
             System.out.println("Invalid username. Please try again.");
             return null;
@@ -301,8 +324,8 @@ public class MusicKonsole {
     }
 
     /**
-     * Attempts to authenticate as an artist by prompting for a username.
-     * If a valid artist is found, logs them in and returns the Artist object.
+     * Attempts to authenticate as an artist by prompting for a username and password.
+     * If a valid artist is found and the password is correct, logs them in and returns the Artist object.
      *
      * @return the logged-in Artist object if successful, null otherwise.
      */
@@ -310,10 +333,17 @@ public class MusicKonsole {
         System.out.println("Enter Artist username:");
         String username = scanner.nextLine();
         Artist artist = musicController.getArtistByName(username);
-
         if (artist != null) {
-            artist.login();
-            return artist;
+            System.out.println("Enter password:");
+            String inputPassword = scanner.nextLine();
+            if (artist.authenticate(inputPassword)) {
+                artist.login();
+                System.out.println("Login successful!");
+                return artist;
+            } else {
+                System.out.println("Incorrect password. Please try again.");
+                return null;
+            }
         } else {
             System.out.println("Invalid username. Please try again.");
             return null;
@@ -356,7 +386,8 @@ public class MusicKonsole {
     }
 
     /**
-     * Prompts the user to enter details for creating a Listener account. The user is asked for their name and email.
+     * Prompts the user to enter details for creating a Listener account.
+     * The user is asked for their name, email, and password.
      * A new Listener object is created and registered using the MusicController instance.
      */
     private void createListenerAccount() {
@@ -364,15 +395,21 @@ public class MusicKonsole {
         String name = scanner.nextLine();
         System.out.println("Enter your email:");
         String email = scanner.nextLine();
-
+        System.out.println("Enter a password:");
+        String password = scanner.nextLine();
+        if (!validatePassword(password)) {
+            System.out.println("Password must be at least 6 characters long. Please try again.");
+            return;
+        }
         Listener newListener = new Listener(name, email);
+        newListener.setPassword(password);
         musicController.registerListener(newListener);
-
         System.out.println("Listener account created successfully! You can now log in as a Listener.");
     }
 
     /**
-     * Prompts the user to enter details for creating an Artist account. The user is asked for their name and email.
+     * Prompts the user to enter details for creating an Artist account.
+     * The user is asked for their name, email, and password.
      * A new Artist object is created and registered using the MusicController instance.
      */
     private void createArtistAccount() {
@@ -380,10 +417,28 @@ public class MusicKonsole {
         String name = scanner.nextLine();
         System.out.println("Enter your email:");
         String email = scanner.nextLine();
+        System.out.println("Enter a password:");
+        String password = scanner.nextLine();
+        if (!validatePassword(password)) {
+            System.out.println("Password must be at least 6 characters long. Please try again.");
+            return;
+        }
         Artist newArtist = new Artist(name, email);
+        newArtist.setPassword(password);
         musicController.registerArtist(newArtist);
         System.out.println("Artist account created successfully! You can now log in as an Artist.");
     }
+    /**
+     * Validates the password entered by the user.
+     * A valid password must be at least 6 characters long.
+     *
+     * @param password The password to validate.
+     * @return True if the password is valid, false otherwise.
+     */
+    private boolean validatePassword(String password) {
+        return password.length() >= 6;
+    }
+
     // ----------------- LISTENER MENU  METHODS -----------------
 
     /** Follows an artist for a specific listener. */
@@ -397,7 +452,10 @@ public class MusicKonsole {
                 }
             }
             System.out.println("Enter artist name to follow:");
-            String artistName = scanner.nextLine();
+            String artistName = scanner.nextLine().trim();
+            if (artistName.isEmpty()) {
+                throw new ValidationException("Artist name cannot be empty.");
+            }
 
             Artist artist = musicController.getArtistByName(artistName);
             if (artist == null) {
@@ -424,8 +482,13 @@ public class MusicKonsole {
                 }
             }
             System.out.println("Enter playlist name:");
-            String playlistName = scanner.nextLine();
-
+            String playlistName = scanner.nextLine().trim();
+            if (playlistName.isEmpty()) {
+                throw new ValidationException("Playlist name cannot be empty.");
+            }
+            if (playlistName.length() > 100) {
+                throw new ValidationException("Playlist name is too long (max 100 characters).");
+            }
             Playlist playlist = new Playlist(playlistName, currentListener);
             musicController.addPlaylist(playlist);
             System.out.println("Playlist " + playlistName + " created successfully.");
@@ -440,7 +503,11 @@ public class MusicKonsole {
     private void addSongToPlaylist() {
         try {
             System.out.println("Enter playlist name:");
-            String playlistName = scanner.nextLine();
+            String playlistName = scanner.nextLine().trim();
+
+            if (playlistName.isEmpty()) {
+                throw new ValidationException("Playlist name cannot be empty.");
+            }
 
             Playlist playlist = musicController.getPlaylistByName(playlistName);
             if (playlist == null) {
@@ -448,7 +515,11 @@ public class MusicKonsole {
             }
 
             System.out.println("Enter song title to add:");
-            String songTitle = scanner.nextLine();
+            String songTitle = scanner.nextLine().trim();
+
+            if (songTitle.isEmpty()) {
+                throw new ValidationException("Song title cannot be empty.");
+            }
 
             Song song = musicController.getSongByTitle(songTitle);
             if (song == null) {
@@ -468,7 +539,12 @@ public class MusicKonsole {
     private void removeSongFromPlaylist() {
         try {
             System.out.println("Enter playlist name:");
-            String playlistName = scanner.nextLine();
+            String playlistName = scanner.nextLine().trim();
+
+            if (playlistName.isEmpty()) {
+                throw new ValidationException("Playlist name cannot be empty.");
+            }
+
 
             Playlist playlist = musicController.getPlaylistByName(playlistName);
             if (playlist == null) {
@@ -476,11 +552,19 @@ public class MusicKonsole {
             }
 
             System.out.println("Enter song title to remove:");
-            String songTitle = scanner.nextLine();
+            String songTitle = scanner.nextLine().trim();
+
+            if (songTitle.isEmpty()) {
+                throw new ValidationException("Song title cannot be empty.");
+            }
 
             Song song = musicController.getSongByTitle(songTitle);
             if (song == null) {
                 throw new EntityNotFoundException("Song not found.");
+            }
+
+            if (!playlist.getSongs().contains(song)) {
+                throw new ValidationException("The song " + songTitle + " is not in the playlist " + playlistName + ".");
             }
 
             musicController.removeSongFromPlaylist(playlistName, songTitle);
@@ -498,6 +582,10 @@ public class MusicKonsole {
             Scanner scanner = new Scanner(System.in);
             System.out.println("Enter the playlist name:");
             String playlistName = scanner.nextLine();
+
+            if (playlistName == null || playlistName.trim().isEmpty()) {
+                throw new ValidationException("Playlist name cannot be empty.");
+            }
 
             Playlist playlist = musicController.getPlaylistByName(playlistName);
             if (playlist == null) {
@@ -520,6 +608,10 @@ public class MusicKonsole {
             System.out.println("Enter the playlist name:");
             String playlistName = scanner.nextLine();
 
+            if (playlistName == null || playlistName.trim().isEmpty()) {
+                throw new ValidationException("Playlist name cannot be empty.");
+            }
+
             Playlist playlist = musicController.getPlaylistByName(playlistName);
             if (playlist == null) {
                 throw new EntityNotFoundException("Playlist not found.");
@@ -540,6 +632,10 @@ public class MusicKonsole {
             Scanner scanner = new Scanner(System.in);
             System.out.println("Enter the playlist name:");
             String playlistName = scanner.nextLine();
+
+            if (playlistName == null || playlistName.trim().isEmpty()) {
+                throw new ValidationException("Playlist name cannot be empty.");
+            }
 
             Playlist playlist = musicController.getPlaylistByName(playlistName);
             if (playlist == null) {
@@ -562,6 +658,10 @@ public class MusicKonsole {
             System.out.println("Enter the song title:");
             String songTitle = scanner.nextLine();
 
+            if (songTitle == null || songTitle.trim().isEmpty()) {
+                throw new ValidationException("Song title cannot be empty.");
+            }
+
             Song song = musicController.getSongByTitle(songTitle);
             if (song == null) {
                 throw new EntityNotFoundException("Song not found.");
@@ -582,6 +682,10 @@ public class MusicKonsole {
             Scanner scanner = new Scanner(System.in);
             System.out.println("Enter the song title:");
             String songTitle = scanner.nextLine();
+
+            if (songTitle == null || songTitle.trim().isEmpty()) {
+                throw new ValidationException("Song title cannot be empty.");
+            }
 
             Song song = musicController.getSongByTitle(songTitle);
             if (song == null) {
@@ -604,6 +708,10 @@ public class MusicKonsole {
             System.out.println("Enter the song title:");
             String songTitle = scanner.nextLine();
 
+            if (songTitle == null || songTitle.trim().isEmpty()) {
+                throw new ValidationException("Song title cannot be empty.");
+            }
+
             Song song = musicController.getSongByTitle(songTitle);
             if (song == null) {
                 throw new EntityNotFoundException("Song not found.");
@@ -625,12 +733,20 @@ public class MusicKonsole {
             System.out.println("Enter playlist name:");
             String playlistName = scanner.nextLine();
 
+            if (playlistName == null || playlistName.trim().isEmpty()) {
+                throw new ValidationException("Playlist name cannot be empty.");
+            }
+
             Playlist playlist = musicController.getPlaylistByName(playlistName);
             if (playlist == null) {
                 throw new EntityNotFoundException("Playlist not found.");
             }
 
             List<Song> songs = playlist.getSongs();
+            if (songs.isEmpty()) {
+                System.out.println("Playlist " + playlistName + " has no songs.");
+                return;
+            }
             System.out.println("Songs in playlist " + playlistName + ":");
             for (Song song : songs) {
                 System.out.println("- " + song.getTitle());
@@ -648,31 +764,44 @@ public class MusicKonsole {
      * If the listener is not found, an account creation prompt is displayed.
      */
     private void createSubscription() {
-        System.out.println("Enter your username:");
-        String username = scanner.nextLine();
-        Listener listener = musicController.getListenerByName(username);
-        if (listener == null) {
-            System.out.println("Listener not found. Please create an account first.");
-            return;
-        }
-        System.out.println("Choose subscription type to create:");
-        System.out.println("1. Basic");
-        System.out.println("2. Premium");
-        int subscriptionChoice = scanner.nextInt();
-        scanner.nextLine();
-        String subscriptionType = "";
-        switch (subscriptionChoice) {
-            case 1:
-                subscriptionType = "basic";
-                break;
-            case 2:
-                subscriptionType = "premium";
-                break;
-            default:
-                System.out.println("Invalid subscription type.");
+        try{
+            if (currentListener == null) {
+                System.out.println("Please log in as a listener before proceeding.");
+                currentListener = listenerLogin();
+                if (currentListener == null) {
+                    throw new ValidationException("Listener login failed.");
+                }
+            }
+            String username = currentListener.getName();
+            Listener listener = musicController.getListenerByName(username);
+            if (listener == null) {
+                System.out.println("Listener not found. Please create an account first.");
                 return;
+            }
+            System.out.println("Choose subscription type to create:");
+            System.out.println("1. Basic");
+            System.out.println("2. Premium");
+            int subscriptionChoice = scanner.nextInt();
+            scanner.nextLine();
+            String subscriptionType = "";
+            switch (subscriptionChoice) {
+                case 1:
+                    subscriptionType = "basic";
+                    break;
+                case 2:
+                    subscriptionType = "premium";
+                    break;
+                default:
+                    System.out.println("Invalid subscription type.");
+                    return;
+            }
+            musicController.createListenerSubscription(listener.getName(), subscriptionType);
+            System.out.println("Subscription created successfully for " + listener.getName() + " with " + subscriptionType + " plan.");
+        }catch (ValidationException e) {
+            System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Database error: " + e.getMessage());
         }
-        musicController.createListenerSubscription(listener.getName(), subscriptionType);
     }
 
     /**
@@ -680,24 +809,46 @@ public class MusicKonsole {
      * Prompts the user for their username and the new subscription type, then upgrades their subscription accordingly.
      */
     private void upgradeSubscription() {
-        System.out.println("Enter your username:");
-        String username = scanner.nextLine();
-        Listener user = musicController.getListenerByName(username);
-        if (user == null) {
-            System.out.println("User not found. Please make sure you are logged in.");
-            return;
+        try{
+            if (currentListener == null) {
+                System.out.println("Please log in as a listener before proceeding.");
+                currentListener = listenerLogin();
+                if (currentListener == null) {
+                    throw new ValidationException("Listener login failed.");
+                }
+            }
+            String username = currentListener.getName();
+            Listener listener = musicController.getListenerByName(username);
+            if (listener == null) {
+                throw new EntityNotFoundException("Listener not found. Please create an account first.");
+            }
+            System.out.println("Enter your subscription type (basic/premium):");
+            String type = scanner.nextLine().toLowerCase();
+            if (!type.equals("basic") && !type.equals("premium")) {
+                throw new ValidationException("Invalid subscription type. Please enter either 'basic' or 'premium'.");
+            }
+            musicController.upgradeSubscription(listener, type);
+            System.out.println("Subscription upgraded successfully to " + type + " for " + listener.getName() + ".");
+        }catch (ValidationException | EntityNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Database error: " + e.getMessage());
         }
-        System.out.println("Enter your subscription type (basic/premium):");
-        String type = scanner.nextLine();
-        musicController.upgradeSubscription(user, type);
+
+
     }
 
     /** Cancels the active subscription for a listener. */
     private void cancelSubscription() {
         try {
-            System.out.println("Enter your username:");
-            String username = scanner.nextLine();
-
+            if (currentListener == null) {
+                System.out.println("Please log in as a listener before proceeding.");
+                currentListener = listenerLogin();
+                if (currentListener == null) {
+                    throw new ValidationException("Listener login failed.");
+                }
+            }
+            String username = currentListener.getName();
             Listener listener = musicController.getListenerByName(username);
             if (listener == null) {
                 throw new EntityNotFoundException("User not found. Please make sure you are logged in.");
@@ -709,7 +860,7 @@ public class MusicKonsole {
             } else {
                 System.out.println("No active subscription found for " + username + ".");
             }
-        } catch (EntityNotFoundException e) {
+        } catch (EntityNotFoundException | ValidationException e) {
             System.out.println("Error: " + e.getMessage());
         } catch (Exception e) {
             System.out.println("Database error: " + e.getMessage());
@@ -723,7 +874,7 @@ public class MusicKonsole {
                 System.out.println("Please log in as a listener before proceeding.");
                 currentListener = listenerLogin();
                 if (currentListener == null) {
-                    return;
+                    throw new ValidationException("Listener login failed.");
                 }
             }
 
@@ -737,8 +888,10 @@ public class MusicKonsole {
                     System.out.println("- " + song.getTitle() + " by " + song.getAlbum().getArtist().getName());
                 }
             }
-        } catch (Exception e) {
+        } catch (ValidationException e) {
             System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Database error: " + e.getMessage());
         }
     }
 
@@ -749,7 +902,7 @@ public class MusicKonsole {
                 System.out.println("Please log in as a listener before proceeding.");
                 currentListener = listenerLogin();
                 if (currentListener == null) {
-                    return;
+                    throw new ValidationException("Listener login failed.");
                 }
             }
 
@@ -763,8 +916,10 @@ public class MusicKonsole {
                     System.out.println("- " + artist.getName());
                 }
             }
-        } catch (Exception e) {
+        } catch (ValidationException e) {
             System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Database error: " + e.getMessage());
         }
     }
 
@@ -775,7 +930,7 @@ public class MusicKonsole {
                 System.out.println("Please log in as a listener before proceeding.");
                 currentListener = listenerLogin();
                 if (currentListener == null) {
-                    return;
+                    throw new ValidationException("Listener login failed.");
                 }
             }
 
@@ -789,8 +944,10 @@ public class MusicKonsole {
                     System.out.println("- " + genre.getName());
                 }
             }
-        } catch (Exception e) {
+        } catch (ValidationException e) {
             System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Database error: " + e.getMessage());
         }
     }
 
@@ -801,8 +958,7 @@ public class MusicKonsole {
                 System.out.println("Please log in as a listener first.");
                 currentListener = listenerLogin();
                 if (currentListener == null) {
-                    System.out.println("Listener login failed.");
-                    return;
+                    throw new ValidationException("Listener login failed.");
                 }
             }
 
@@ -816,10 +972,10 @@ public class MusicKonsole {
             } else {
                 throw new EntityNotFoundException("Song not found.");
             }
-        } catch (EntityNotFoundException e) {
+        } catch (ValidationException | EntityNotFoundException e) {
             System.out.println("Error: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println("Database error: " + e.getMessage());
         }
     }
 
@@ -830,8 +986,7 @@ public class MusicKonsole {
                 System.out.println("Please log in as a listener first.");
                 currentListener = listenerLogin();
                 if (currentListener == null) {
-                    System.out.println("Listener login failed.");
-                    return;
+                    throw new ValidationException("Listener login failed.");
                 }
             }
 
@@ -846,8 +1001,10 @@ public class MusicKonsole {
             } else {
                 System.out.println("No songs found in history for " + listenerName + ".");
             }
-        } catch (Exception e) {
+        } catch (ValidationException e) {
             System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Database error: " + e.getMessage());
         }
     }
 
@@ -884,6 +1041,10 @@ public class MusicKonsole {
             } else {
                 System.out.println("No tickets available for the concert: " + concertTitle);
             }
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid input: " + e.getMessage());
+        } catch (EntityNotFoundException e) {
+            System.out.println("Error: Concert not found. " + e.getMessage());
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -895,8 +1056,12 @@ public class MusicKonsole {
             Scanner scanner = new Scanner(System.in);
             System.out.println("Enter the name of the artist to view their discography:");
             String artistName = scanner.nextLine();
-
+            if (artistName == null || artistName.trim().isEmpty()) {
+                throw new ValidationException("Artist name cannot be empty.");
+            }
             musicController.viewArtistDiscography(artistName);
+        } catch (ValidationException e) {
+            System.out.println("Input error: " + e.getMessage());
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -905,27 +1070,31 @@ public class MusicKonsole {
     /** Registers a listener for a specific concert. */
     private void attendConcert() {
         try {
+            if (currentListener == null) {
+                System.out.println("Please log in as a listener first.");
+                currentListener = listenerLogin();
+                if (currentListener == null) {
+                    throw new ValidationException("Listener login failed.");
+                }
+            }
             Scanner scanner = new Scanner(System.in);
             System.out.println("Enter the title of the concert you want to attend:");
             String concertTitle = scanner.nextLine();
-            System.out.println("Enter your username:");
-            String username = scanner.nextLine();
-
-            Listener listener = musicController.getListenerByName(username);
             LiveConcert concert = musicController.getConcertByTitle(concertTitle);
-
-            if (listener != null && concert != null) {
-                boolean added = musicController.addAttendee(concert.getId(), listener);
-                if (added) {
-                    System.out.println("You have successfully registered for the concert: " + concertTitle);
-                } else {
-                    System.out.println("You are already registered for this concert.");
-                }
-            } else {
-                System.out.println("Concert or listener not found.");
+            if (concert == null) {
+                throw new EntityNotFoundException("Concert not found.");
             }
-        } catch (Exception e) {
+            Listener listener = currentListener;
+            boolean added = musicController.addAttendee(concert.getId(), listener);
+            if (added) {
+                System.out.println("You have successfully registered for the concert: " + concertTitle);
+            } else {
+                System.out.println("You are already registered for this concert.");
+            }
+        } catch (EntityNotFoundException | ValidationException e) {
             System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Database error: " + e.getMessage());
         }
     }
 
@@ -936,8 +1105,7 @@ public class MusicKonsole {
                 System.out.println("Please log in as a listener first.");
                 currentListener = listenerLogin();
                 if (currentListener == null) {
-                    System.out.println("Listener login failed.");
-                    return;
+                    throw new ValidationException("Listener login failed.");
                 }
             }
 
@@ -948,8 +1116,10 @@ public class MusicKonsole {
 
             double vipScore = musicController.getConcertVIPScore(currentListener, concertId);
             System.out.println("The VIP score for the concert is: " + vipScore);
-        } catch (Exception e) {
+        } catch (ValidationException e) {
             System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Database error: " + e.getMessage());
         }
     }
 
@@ -958,16 +1128,20 @@ public class MusicKonsole {
     /**1* Prompts the user to enter details to create a new album. */
     private void createAlbum() {
         try {
+            if (currentArtist == null) {
+                System.out.println("Please log in as an artist first.");
+                currentArtist = artistLogin();
+                if (currentArtist == null) {
+                    throw new ValidationException("Artist login failed.");
+                }
+            }
             System.out.println("Enter album title:");
             String albumTitle = scanner.nextLine();
             System.out.println("Enter release date (YYYY-MM-DD):");
             String dateInput = scanner.nextLine();
             try {
                 LocalDate releaseDate = LocalDate.parse(dateInput, DateTimeFormatter.ISO_LOCAL_DATE);
-                System.out.println("Enter artist name:");
-                String artistName = scanner.nextLine();
-
-                Artist artist = musicController.getArtistByName(artistName);
+                Artist artist = currentArtist;
                 if (artist == null) {
                     throw new EntityNotFoundException("Artist not found.");
                 }
@@ -1004,12 +1178,18 @@ public class MusicKonsole {
     /**2* Prompts the user to upload a new song. */
     private void uploadSong() {
         try {
+            if (currentArtist == null) {
+                System.out.println("Please log in as an artist first.");
+                currentArtist = artistLogin();
+                if (currentArtist == null) {
+                    throw new ValidationException("Artist login failed.");
+                }
+            }
             System.out.println("Enter song title:");
             String songTitle = scanner.nextLine();
-            System.out.println("Enter artist name:");
-            String artistName = scanner.nextLine();
 
-            Artist artist = musicController.getArtistByName(artistName);
+
+            Artist artist = currentArtist;
             if (artist == null) {
                 throw new EntityNotFoundException("Artist not found.");
             }
@@ -1061,6 +1241,13 @@ public class MusicKonsole {
     /**3* Prompts the user to start a concert. */
     private void startConcert() {
         try {
+            if (currentArtist == null) {
+                System.out.println("Please log in as an artist first.");
+                currentArtist = artistLogin();
+                if (currentArtist == null) {
+                    throw new ValidationException("Artist login failed.");
+                }
+            }
             System.out.println("Enter concert title to start:");
             String concertTitle = scanner.nextLine();
 
@@ -1070,6 +1257,9 @@ public class MusicKonsole {
             }
 
             Artist artist = concert.getArtist();
+            if (artist == null || !artist.equals(currentArtist)) {
+                throw new EntityNotFoundException("This concert does not belong to the current artist.");
+            }
             System.out.println("Artist for this concert: " + artist.getName());
             String eventType = concert.getEventType();
             System.out.println("Event Type: " + eventType);
@@ -1101,9 +1291,26 @@ public class MusicKonsole {
      * Calls the method from the MusicController to stop the concert*/
     private void endConcert() {
         try {
+            if (currentArtist == null) {
+                System.out.println("Please log in as an artist first.");
+                currentArtist = artistLogin();
+                if (currentArtist == null) {
+                    throw new ValidationException("Artist login failed.");
+                }
+            }
             System.out.println("Enter concert title to end:");
             String concertTitle = scanner.nextLine();
+            LiveConcert concert = musicController.getConcertByTitle(concertTitle);
+            if (concert == null) {
+                throw new EntityNotFoundException("Concert not found.");
+            }
+            Artist artist = concert.getArtist();
+            if (artist == null || !artist.equals(currentArtist)) {
+                throw new EntityNotFoundException("This concert does not belong to the current artist.");
+            }
             musicController.endConcert(concertTitle);
+        } catch (EntityNotFoundException | ValidationException e) {
+            System.out.println("Error: " + e.getMessage());
         } catch (Exception e) {
             System.out.println("An error occurred: " + e.getMessage());
         }
@@ -1134,10 +1341,9 @@ public class MusicKonsole {
 
     /**6* Prompts the user to enter the title of an album and retrieves a list of songs in that album. */
     private void getSongsInAlbum() {
-        Scanner scanner = new Scanner(System.in);
         try {
             System.out.println("Enter album title:");
-            String albumTitle = scanner.nextLine();
+            String albumTitle = scanner.nextLine().trim();
 
             Album album = musicController.getAlbumByName(albumTitle);
             if (album == null) {
@@ -1162,10 +1368,9 @@ public class MusicKonsole {
 
     /**7* Prompts the user to enter an album title and a song title to remove from the album. */
     private void removeSongFromAlbum() {
-        Scanner scanner = new Scanner(System.in);
         try {
             System.out.println("Enter album title:");
-            String albumTitle = scanner.nextLine();
+            String albumTitle = scanner.nextLine().trim();
 
             Album album = musicController.getAlbumByName(albumTitle);
             if (album == null) {
@@ -1173,7 +1378,7 @@ public class MusicKonsole {
             }
 
             System.out.println("Enter song title to remove:");
-            String songTitle = scanner.nextLine();
+            String songTitle = scanner.nextLine().trim();
             Song song = musicController.getSongByTitle(songTitle);
 
             if (song == null || !album.getSongs().contains(song)) {
@@ -1192,10 +1397,9 @@ public class MusicKonsole {
 
     /**8* Prompts the user to enter an album title and the maximum number of songs allowed in an album. */
     private void validateAlbumSongs() {
-        Scanner scanner = new Scanner(System.in);
         try {
             System.out.println("Enter album title:");
-            String albumTitle = scanner.nextLine();
+            String albumTitle = scanner.nextLine().trim();
 
             Album album = musicController.getAlbumByName(albumTitle);
             if (album == null) {
@@ -1220,15 +1424,16 @@ public class MusicKonsole {
 
     /**9* Prompts the user to enter the name of an artist and displays the list of listeners who follow that artist. */
     private void viewFollowers() {
-        Scanner scanner = new Scanner(System.in);
         try {
-            System.out.println("Enter artist name to view followers:");
-            String artistName = scanner.nextLine();
-
-            Artist artist = musicController.getArtistByName(artistName);
-            if (artist == null) {
-                throw new EntityNotFoundException("Artist not found.");
+            if (currentArtist == null) {
+                System.out.println("Please log in as an artist first.");
+                currentArtist = artistLogin();
+                if (currentArtist == null) {
+                    throw new ValidationException("Artist login failed.");
+                }
             }
+            Artist artist = currentArtist;
+            System.out.println("Viewing followers for artist: " + artist.getName());
 
             List<Listener> followers = artist.getFollowers();
             if (followers.isEmpty()) {
@@ -1249,9 +1454,25 @@ public class MusicKonsole {
     /***10 Prompts the user to enter a concert title and displays the list of attendees for that concert.
      * Calls the method from MusicController to display the concert attendees.*/
     private void viewAttendeesForConcert() {
-        System.out.println("Enter the title of the concert to view attendees:");
-        String concertTitle = scanner.nextLine();
-        musicController.showAttendees(concertTitle);
+        try {
+            if (currentArtist == null) {
+                System.out.println("Please log in as an artist first.");
+                currentArtist = artistLogin();
+                if (currentArtist == null) {
+                    throw new ValidationException("Artist login failed.");
+                }
+            }
+            System.out.println("Enter the title of the concert to view attendees:");
+            String concertTitle = scanner.nextLine().trim();
+            if (concertTitle.isEmpty()) {
+                throw new ValidationException("Concert title cannot be empty.");
+            }
+            musicController.showAttendees(concertTitle);
+        }catch (ValidationException e) {
+            System.out.println("Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Database error: " + e.getMessage());
+        }
     }
 
     /**
@@ -1264,7 +1485,6 @@ public class MusicKonsole {
             scanner.nextLine();
             System.out.println("Enter genre name:");
             String genreName = scanner.nextLine();
-
             if (genreName.isEmpty()) {
                 throw new ValidationException("Genre name cannot be empty.");
             }
@@ -1316,14 +1536,18 @@ public class MusicKonsole {
      * If no albums are found, a message is displayed. Otherwise, the album titles are printed in order from the earliest to the most recent.
      */
     private void sortAlbumsByReleaseDate() {
-        System.out.println("Enter artist ID:");
-        int artistId = scanner.nextInt();
-        System.out.println("Sorting albums by release date:");
-        List<Album> albums = musicController.sortAlbumsByReleaseDate(artistId);
-        if (albums.isEmpty()) {
-            System.out.println("No albums found.");
-        } else {
-            albums.forEach(song -> System.out.println(song.getTitle()));
+        try {
+            System.out.println("Enter artist ID:");
+            int artistId = scanner.nextInt();
+            System.out.println("Sorting albums by release date:");
+            List<Album> albums = musicController.sortAlbumsByReleaseDate(artistId);
+            if (albums.isEmpty()) {
+                System.out.println("No albums found.");
+            } else {
+                albums.forEach(song -> System.out.println(song.getTitle()));
+            }
+        }catch (Exception e) {
+            System.out.println("Database error: " + e.getMessage());
         }
     }
 
@@ -1377,4 +1601,92 @@ public class MusicKonsole {
             System.out.println("Database error: " + e.getMessage());
         }
     }
+
+    //MUST BE TESTED
+    private void deleteAlbum() {
+        try {
+            if (currentArtist == null) {
+                System.out.println("Please log in as an artist first.");
+                currentArtist = artistLogin();
+                if (currentArtist == null) {
+                    throw new ValidationException("Artist login failed.");
+                }
+            }
+            System.out.print("Enter Album ID to delete: ");
+            int albumId = scanner.nextInt();
+            scanner.nextLine();
+            musicController.deleteAlbum(albumId);
+        }catch (Exception e) {
+            System.out.println("An error occurred: " + e.getMessage());
+        }
+
+    }
+    //MUST BE TESTED
+    private void deleteSong() {
+        try {
+            if (currentArtist == null) {
+                System.out.println("Please log in as an artist first.");
+                currentArtist = artistLogin();
+                if (currentArtist == null) {
+                    throw new ValidationException("Artist login failed.");
+                }
+            }
+            System.out.print("Enter Song ID to delete: ");
+            int songId = scanner.nextInt();
+            scanner.nextLine();
+            musicController.deleteSong(songId);
+        }catch (Exception e) {
+            System.out.println("An error occurred: " + e.getMessage());
+        }
+
+    }
+
+    //MUST BE TESTED
+    private void updateAlbumDetails() {
+        try {
+            if (currentArtist == null) {
+                System.out.println("Please log in as an artist first.");
+                currentArtist = artistLogin();
+                if (currentArtist == null) {
+                    throw new ValidationException("Artist login failed.");
+                }
+            }
+            System.out.print("Enter Album ID to update: ");
+            int albumId = scanner.nextInt();
+            scanner.nextLine();
+            System.out.print("Enter new Album Name: ");
+            String newName = scanner.nextLine();
+            System.out.print("Enter new Album Genre: ");
+            String newGenre = scanner.nextLine();
+            musicController.updateAlbumDetails(albumId, newName, newGenre);
+        }catch (Exception e) {
+            System.out.println("An error occurred: " + e.getMessage());
+        }
+    }
+    //MUST BE TESTED
+    private void updateSongDetails() {
+        try {
+            if (currentArtist == null) {
+                System.out.println("Please log in as an artist first.");
+                currentArtist = artistLogin();
+                if (currentArtist == null) {
+                    throw new ValidationException("Artist login failed.");
+                }
+            }
+            System.out.print("Enter Song ID to update: ");
+            int songId = scanner.nextInt();
+            scanner.nextLine();
+            System.out.print("Enter new Song Title: ");
+            String newTitle = scanner.nextLine();
+            System.out.print("Enter new Song Genre: ");
+            String newGenre = scanner.nextLine();
+            musicController.updateSongDetails(songId, newTitle, newGenre);
+        }catch (Exception e) {
+            System.out.println("An error occurred: " + e.getMessage());
+        }
+    }
+
+
+
+
 }
