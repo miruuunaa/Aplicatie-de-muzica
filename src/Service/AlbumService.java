@@ -1,6 +1,7 @@
 package Service;
 import Domain.Album;
 import Domain.Artist;
+import Domain.Genre;
 import Domain.Song;
 import Exceptions.DatabaseException;
 import Repository.IRepository;
@@ -178,6 +179,34 @@ public class AlbumService {
         }catch (DatabaseException e){
             throw new DatabaseException("Database error while retrieving album for sorting: " + e.getMessage());
         }
+    }
+    public boolean deleteAlbum(int albumId) throws DatabaseException {
+        try {
+            albumRepository.delete(albumId);
+            return true;
+        } catch (Exception e) {
+            throw new DatabaseException("An error occurred while deleting the album: " + e.getMessage());
+        }
+    }
+
+    public boolean updateAlbumDetails(int albumId, String newName, String newGenre)
+            throws EntityNotFoundException, ValidationException {
+
+        if (newName == null || newName.trim().isEmpty()) {
+            throw new ValidationException("Album name cannot be empty.");
+        }
+
+        if (newGenre == null || newGenre.trim().isEmpty()) {
+            throw new ValidationException("Album genre cannot be empty.");
+        }
+        Album album = albumRepository.get(albumId);
+        if (album == null) {
+            throw new EntityNotFoundException("Album with ID " + albumId + " not found.");
+        }
+        album.setTitle(newName);
+        album.setGenre(new Genre(newGenre));
+        albumRepository.update(album);
+        return true;
     }
 
 

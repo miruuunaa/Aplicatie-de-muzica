@@ -1,5 +1,7 @@
 package Service;
+import Domain.Genre;
 import Domain.Song;
+import Exceptions.DatabaseException;
 import Repository.IRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -124,5 +126,34 @@ public class SongService {
         }
 
         song.pause();
+    }
+
+    public boolean deleteSong(int songId) throws  DatabaseException {
+        try {
+            songRepository.delete(songId);
+            return true;
+        } catch (Exception e) {
+            throw new DatabaseException("An error occurred while deleting the song: " + e.getMessage());
+        }
+    }
+
+    public boolean updateSongDetails(int songId, String newTitle, String newGenre)
+            throws EntityNotFoundException, ValidationException {
+        if (newTitle == null || newTitle.trim().isEmpty()) {
+            throw new ValidationException("Song title cannot be empty.");
+        }
+
+        if (newGenre == null || newGenre.trim().isEmpty()) {
+            throw new ValidationException("Song genre cannot be empty.");
+        }
+        Song song = songRepository.get(songId);
+        if (song == null) {
+            throw new EntityNotFoundException("Song with ID " + songId + " not found.");
+        }
+
+        song.setTitle(newTitle);
+        song.setGenre(new Genre(newGenre));
+        songRepository.update(song);
+        return true;
     }
 }
