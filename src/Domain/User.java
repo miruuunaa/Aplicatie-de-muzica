@@ -8,6 +8,7 @@ public abstract class User {
     private int id;
     private String name;
     private String email;
+    private String password;
     /**
      * Constructs a User object with the specified name and email.
      *
@@ -17,7 +18,21 @@ public abstract class User {
     public User(String name, String email) {
         this.name = name;
         this.email = email;
+        this.password=null;
     }
+
+    public boolean authenticate(String inputPassword) {
+        return this.password != null && this.password.equals(inputPassword);
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     /**
      * Gets the unique ID of the user.
      *

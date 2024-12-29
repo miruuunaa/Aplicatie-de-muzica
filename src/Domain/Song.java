@@ -71,6 +71,11 @@ public class Song implements Playable {
     public String getTitle() {
         return title;
     }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     /**
      * Gets the duration of the song in minutes.
      *

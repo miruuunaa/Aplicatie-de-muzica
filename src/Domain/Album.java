@@ -42,6 +42,10 @@ public class Album {
         return title;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     /**
      * Retrieves the list of songs in the album.
      *
