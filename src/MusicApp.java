@@ -205,26 +205,66 @@ public class MusicApp {
      */
     private static IRepository<Artist> createInMemoryArtistRepository() {
         IRepository<Artist> artistRepo = new InMemoryRepository<>();
-        artistRepo.create(new Artist("The Beatles", "beatles@gmail.com"));
-        artistRepo.create(new Artist("Beyonce", "beyonceles@gmail.com"));
-        artistRepo.create(new Artist("Adele", "adele@gmail.com"));
-        artistRepo.create(new Artist("Ed Sheeran", "sheeran@gmail.com"));
-        artistRepo.create(new Artist("Metallica", "metallica@gmail.com"));
-        artistRepo.create(new Artist("Taylor Swift", "taylor.swift@example.com"));
-        artistRepo.create(new Artist("Drake", "drake@example.com"));
-        artistRepo.create(new Artist("Ariana Grande", "ariana.grande@example.com"));
-        artistRepo.create(new Artist("Billie Eilish", "billie.eilish@example.com"));
-        artistRepo.create(new Artist("Bruno Mars", "bruno.mars@example.com"));
-        artistRepo.create(new Artist("Justin Bieber", "justin.bieber@example.com"));
-        artistRepo.create(new Artist("The Weeknd", "the.weeknd@example.com"));
-        artistRepo.create(new Artist("Lady Gaga", "lady.gaga@example.com"));
-        artistRepo.create(new Artist("Kendrick Lamar", "kendrick.lamar@example.com"));
-        artistRepo.create(new Artist("Post Malone", "post.malone@example.com"));
-        artistRepo.create(new Artist("Cardi B", "cardi.b@example.com"));
-        artistRepo.create(new Artist("Shawn Mendes", "shawn.mendes@example.com"));
-        artistRepo.create(new Artist("Dua Lipa", "dua.lipa@example.com"));
-        artistRepo.create(new Artist("Harry Styles", "harry.styles@example.com"));
-        artistRepo.create(new Artist("Eminem", "eminem@example.com"));
+        Artist theBeatles = new Artist("The Beatles", "beatles@gmail.com");
+        theBeatles.setPassword("beatles123");
+        artistRepo.create(theBeatles);
+        Artist beyonce = new Artist("Beyonce", "beyonceles@gmail.com");
+        beyonce.setPassword("beyonce123");
+        artistRepo.create(beyonce);
+        Artist adele = new Artist("Adele", "adele@gmail.com");
+        adele.setPassword("adele123");
+        artistRepo.create(adele);
+        Artist edSheeran = new Artist("Ed Sheeran", "sheeran@gmail.com");
+        edSheeran.setPassword("sheeran123");
+        artistRepo.create(edSheeran);
+        Artist metallica = new Artist("Metallica", "metallica@gmail.com");
+        metallica.setPassword("metallica123");
+        artistRepo.create(metallica);
+        Artist taylorSwift = new Artist("Taylor Swift", "taylor.swift@example.com");
+        taylorSwift.setPassword("taylor123");
+        artistRepo.create(taylorSwift);
+        Artist drake = new Artist("Drake", "drake@example.com");
+        drake.setPassword("drake123");
+        artistRepo.create(drake);
+        Artist arianaGrande = new Artist("Ariana Grande", "ariana.grande@example.com");
+        arianaGrande.setPassword("ariana123");
+        artistRepo.create(arianaGrande);
+        Artist billieEilish = new Artist("Billie Eilish", "billie.eilish@example.com");
+        billieEilish.setPassword("billie123");
+        artistRepo.create(billieEilish);
+        Artist brunoMars = new Artist("Bruno Mars", "bruno.mars@example.com");
+        brunoMars.setPassword("bruno123");
+        artistRepo.create(brunoMars);
+        Artist justinBieber = new Artist("Justin Bieber", "justin.bieber@example.com");
+        justinBieber.setPassword("justin123");
+        artistRepo.create(justinBieber);
+        Artist theWeeknd = new Artist("The Weeknd", "the.weeknd@example.com");
+        theWeeknd.setPassword("weeknd123");
+        artistRepo.create(theWeeknd);
+        Artist ladyGaga = new Artist("Lady Gaga", "lady.gaga@example.com");
+        ladyGaga.setPassword("gaga123");
+        artistRepo.create(ladyGaga);
+        Artist kendrickLamar = new Artist("Kendrick Lamar", "kendrick.lamar@example.com");
+        kendrickLamar.setPassword("kendrick123");
+        artistRepo.create(kendrickLamar);
+        Artist postMalone = new Artist("Post Malone", "post.malone@example.com");
+        postMalone.setPassword("post123");
+        artistRepo.create(postMalone);
+        Artist cardiB = new Artist("Cardi B", "cardi.b@example.com");
+        cardiB.setPassword("cardi123");
+        artistRepo.create(cardiB);
+        Artist shawnMendes = new Artist("Shawn Mendes", "shawn.mendes@example.com");
+        shawnMendes.setPassword("shawn123");
+        artistRepo.create(shawnMendes);
+        Artist duaLipa = new Artist("Dua Lipa", "dua.lipa@example.com");
+        duaLipa.setPassword("dua123");
+        artistRepo.create(duaLipa);
+        Artist harryStyles = new Artist("Harry Styles", "harry.styles@example.com");
+        harryStyles.setPassword("harry123");
+        artistRepo.create(harryStyles);
+        Artist eminem = new Artist("Eminem", "eminem@example.com");
+        eminem.setPassword("eminem123");
+        artistRepo.create(eminem);
         artistRepo.getAll().values().forEach(System.out::println);
         return artistRepo;
     }
@@ -440,26 +480,30 @@ public class MusicApp {
      */
     private static IRepository<Listener> createInMemoryListenerRepository() {
         IRepository<Listener> listenerRepo = new InMemoryRepository<>();
-        listenerRepo.create(new Listener( "John", "john.doe@email.com"));
-        listenerRepo.create(new Listener( "Jane Smith", "jane.smith@email.com"));
-        listenerRepo.create(new Listener( "Chris Johnson", "chris.johnson@email.com"));
-        listenerRepo.create(new Listener( "Sarah Williams", "sarah.williams@email.com"));
-        listenerRepo.create(new Listener( "David Brown", "david.brown@email.com"));
-        listenerRepo.create(new Listener("Alice Walker", "alice.walker@example.com"));
-        listenerRepo.create(new Listener("Bob Marley", "bob.marley@example.com"));
-        listenerRepo.create(new Listener("Charlie Brown", "charlie.brown@example.com"));
-        listenerRepo.create(new Listener("Daisy Johnson", "daisy.johnson@example.com"));
-        listenerRepo.create(new Listener("Edward Elric", "edward.elric@example.com"));
-        listenerRepo.create(new Listener("Fiona Apple", "fiona.apple@example.com"));
-        listenerRepo.create(new Listener("George Orwell", "george.orwell@example.com"));
-        listenerRepo.create(new Listener("Hannah Montana", "hannah.montana@example.com"));
-        listenerRepo.create(new Listener("Isaac Newton", "isaac.newton@example.com"));
-        listenerRepo.create(new Listener("Jack Sparrow", "jack.sparrow@example.com"));
-        listenerRepo.create(new Listener("Karen Page", "karen.page@example.com"));
-        listenerRepo.create(new Listener("Larry Page", "larry.page@example.com"));
-        listenerRepo.create(new Listener("Monica Geller", "monica.geller@example.com"));
-        listenerRepo.create(new Listener("Nick Fury", "nick.fury@example.com"));
-        listenerRepo.create(new Listener("Olivia Pope", "olivia.pope@example.com"));
+        Listener john = new Listener("John", "john.doe@email.com");
+        john.setPassword("john123");
+        listenerRepo.create(john);
+        Listener jane = new Listener("Jane Smith", "jane.smith@email.com");
+        jane.setPassword("jane123");
+        listenerRepo.create(jane);
+        Listener chris = new Listener("Chris Johnson", "chris.johnson@email.com");
+        chris.setPassword("chris123");
+        listenerRepo.create(chris);
+        Listener sarah = new Listener("Sarah Williams", "sarah.williams@email.com");
+        sarah.setPassword("sarah123");
+        listenerRepo.create(sarah);
+        Listener david = new Listener("David Brown", "david.brown@email.com");
+        david.setPassword("david123");
+        listenerRepo.create(david);
+        Listener alice = new Listener("Alice Walker", "alice.walker@example.com");
+        alice.setPassword("alice123");
+        listenerRepo.create(alice);
+        Listener bob = new Listener("Bob Marley", "bob.marley@example.com");
+        bob.setPassword("bob123");
+        listenerRepo.create(bob);
+        Listener charlie = new Listener("Charlie Brown", "charlie.brown@example.com");
+        charlie.setPassword("charlie123");
+        listenerRepo.create(charlie);
         listenerRepo.getAll().values().forEach(System.out::println);
         return listenerRepo;
     }
@@ -480,18 +524,6 @@ public class MusicApp {
         Subscription sub6=new Subscription("Basic", 9.99f, listenerRepo.get(1));  // Alice Walker
         Subscription sub7=new Subscription("Premium", 14.99f, listenerRepo.get(2)); // Bob Marley
         Subscription sub8=new Subscription("Basic", 9.99f, listenerRepo.get(3));  // Charlie Brown
-        Subscription sub9=new Subscription("Premium", 14.99f, listenerRepo.get(4)); // Daisy Johnson
-        Subscription sub10=new Subscription("Basic", 9.99f, listenerRepo.get(5));    // Edward Elric
-        Subscription sub11=new Subscription("Premium", 14.99f, listenerRepo.get(6)); // Fiona Apple
-        Subscription sub12=new Subscription("Basic", 9.99f, listenerRepo.get(7));    // George Orwell
-        Subscription sub13=new Subscription("Premium", 14.99f, listenerRepo.get(8)); // Hannah Montana
-        Subscription sub14=new Subscription("Basic", 9.99f, listenerRepo.get(9));    // Isaac Newton
-        Subscription sub15=new Subscription("Premium", 14.99f, listenerRepo.get(10)); // Jack Sparrow
-        Subscription sub16=new Subscription("Basic", 9.99f, listenerRepo.get(11));   // Karen Page
-        Subscription sub17=new Subscription("Premium", 14.99f, listenerRepo.get(12)); // Larry Page
-        Subscription sub18=new Subscription("Basic", 9.99f, listenerRepo.get(13));   // Monica Geller
-        Subscription sub19=new Subscription("Premium", 14.99f, listenerRepo.get(14)); // Nick Fury
-        Subscription sub20=new Subscription("Basic", 9.99f, listenerRepo.get(15));  // Olivia Pope
         Listener john = listenerRepo.get(1);
         Listener jane = listenerRepo.get(2);
         Listener chris = listenerRepo.get(3);
@@ -500,18 +532,6 @@ public class MusicApp {
         Listener alice =listenerRepo.get(6);
         Listener bob = listenerRepo.get(7);
         Listener charlie = listenerRepo.get(8);
-        Listener daisy = listenerRepo.get(9);
-        Listener edward = listenerRepo.get(10);
-        Listener fiona = listenerRepo.get(11);
-        Listener george = listenerRepo.get(12);
-        Listener hannah =listenerRepo.get(13);
-        Listener isaac = listenerRepo.get(14);
-        Listener jack = listenerRepo.get(15);
-        Listener karen = listenerRepo.get(16);
-        Listener larry = listenerRepo.get(17);
-        Listener monica = listenerRepo.get(18);
-        Listener nick = listenerRepo.get(19);
-        Listener olivia = listenerRepo.get(20);
         if (john != null) {
             john.setSubscription(sub1);
         }
@@ -536,42 +556,6 @@ public class MusicApp {
         if (charlie != null) {
             charlie.setSubscription(sub8);
         }
-        if (daisy != null) {
-            daisy.setSubscription(sub9);
-        }
-        if (edward != null) {
-            edward.setSubscription(sub10);
-        }
-        if (fiona != null) {
-            fiona.setSubscription(sub11);
-        }
-        if (george != null) {
-            george.setSubscription(sub12);
-        }
-        if (hannah != null) {
-            hannah.setSubscription(sub13);
-        }
-        if (isaac != null) {
-            isaac.setSubscription(sub14);
-        }
-        if (jack!= null) {
-            jack.setSubscription(sub15);
-        }
-        if (karen!= null) {
-            karen.setSubscription(sub16);
-        }
-        if (larry != null) {
-            larry.setSubscription(sub17);
-        }
-        if (monica != null) {
-            monica.setSubscription(sub18);
-        }
-        if (nick != null) {
-            nick.setSubscription(sub19);
-        }
-        if (olivia != null) {
-            olivia.setSubscription(sub20);
-        }
         subscriptionRepo.create(sub1);
         subscriptionRepo.create(sub2);
         subscriptionRepo.create(sub3);
@@ -580,18 +564,6 @@ public class MusicApp {
         subscriptionRepo.create(sub6);
         subscriptionRepo.create(sub7);
         subscriptionRepo.create(sub8);
-        subscriptionRepo.create(sub9);
-        subscriptionRepo.create(sub10);
-        subscriptionRepo.create(sub11);
-        subscriptionRepo.create(sub12);
-        subscriptionRepo.create(sub13);
-        subscriptionRepo.create(sub14);
-        subscriptionRepo.create(sub15);
-        subscriptionRepo.create(sub16);
-        subscriptionRepo.create(sub17);
-        subscriptionRepo.create(sub18);
-        subscriptionRepo.create(sub19);
-        subscriptionRepo.create(sub20);
         subscriptionRepo.getAll().values().forEach(System.out::println);
         return subscriptionRepo;
     }
@@ -631,26 +603,66 @@ public class MusicApp {
     private static IRepository<Artist> createFileBasedArtistRepository() {
         String filePath = "artists.csv"; // Specify the file to store the data.
         IRepository<Artist> artistRepo = new FileRepository<>(filePath);
-        artistRepo.create(new Artist("The Beatles", "beatles@gmail.com"));
-        artistRepo.create(new Artist("Beyonce", "beyonceles@gmail.com"));
-        artistRepo.create(new Artist("Adele", "adele@gmail.com"));
-        artistRepo.create(new Artist("Ed Sheeran", "sheeran@gmail.com"));
-        artistRepo.create(new Artist("Metallica", "metallica@gmail.com"));
-        artistRepo.create(new Artist("Taylor Swift", "taylor.swift@example.com"));
-        artistRepo.create(new Artist("Drake", "drake@example.com"));
-        artistRepo.create(new Artist("Ariana Grande", "ariana.grande@example.com"));
-        artistRepo.create(new Artist("Billie Eilish", "billie.eilish@example.com"));
-        artistRepo.create(new Artist("Bruno Mars", "bruno.mars@example.com"));
-        artistRepo.create(new Artist("Justin Bieber", "justin.bieber@example.com"));
-        artistRepo.create(new Artist("The Weeknd", "the.weeknd@example.com"));
-        artistRepo.create(new Artist("Lady Gaga", "lady.gaga@example.com"));
-        artistRepo.create(new Artist("Kendrick Lamar", "kendrick.lamar@example.com"));
-        artistRepo.create(new Artist("Post Malone", "post.malone@example.com"));
-        artistRepo.create(new Artist("Cardi B", "cardi.b@example.com"));
-        artistRepo.create(new Artist("Shawn Mendes", "shawn.mendes@example.com"));
-        artistRepo.create(new Artist("Dua Lipa", "dua.lipa@example.com"));
-        artistRepo.create(new Artist("Harry Styles", "harry.styles@example.com"));
-        artistRepo.create(new Artist("Eminem", "eminem@example.com"));
+        Artist theBeatles = new Artist("The Beatles", "beatles@gmail.com");
+        theBeatles.setPassword("beatles123");
+        artistRepo.create(theBeatles);
+        Artist beyonce = new Artist("Beyonce", "beyonceles@gmail.com");
+        beyonce.setPassword("beyonce123");
+        artistRepo.create(beyonce);
+        Artist adele = new Artist("Adele", "adele@gmail.com");
+        adele.setPassword("adele123");
+        artistRepo.create(adele);
+        Artist edSheeran = new Artist("Ed Sheeran", "sheeran@gmail.com");
+        edSheeran.setPassword("sheeran123");
+        artistRepo.create(edSheeran);
+        Artist metallica = new Artist("Metallica", "metallica@gmail.com");
+        metallica.setPassword("metallica123");
+        artistRepo.create(metallica);
+        Artist taylorSwift = new Artist("Taylor Swift", "taylor.swift@example.com");
+        taylorSwift.setPassword("taylor123");
+        artistRepo.create(taylorSwift);
+        Artist drake = new Artist("Drake", "drake@example.com");
+        drake.setPassword("drake123");
+        artistRepo.create(drake);
+        Artist arianaGrande = new Artist("Ariana Grande", "ariana.grande@example.com");
+        arianaGrande.setPassword("ariana123");
+        artistRepo.create(arianaGrande);
+        Artist billieEilish = new Artist("Billie Eilish", "billie.eilish@example.com");
+        billieEilish.setPassword("billie123");
+        artistRepo.create(billieEilish);
+        Artist brunoMars = new Artist("Bruno Mars", "bruno.mars@example.com");
+        brunoMars.setPassword("bruno123");
+        artistRepo.create(brunoMars);
+        Artist justinBieber = new Artist("Justin Bieber", "justin.bieber@example.com");
+        justinBieber.setPassword("justin123");
+        artistRepo.create(justinBieber);
+        Artist theWeeknd = new Artist("The Weeknd", "the.weeknd@example.com");
+        theWeeknd.setPassword("weeknd123");
+        artistRepo.create(theWeeknd);
+        Artist ladyGaga = new Artist("Lady Gaga", "lady.gaga@example.com");
+        ladyGaga.setPassword("gaga123");
+        artistRepo.create(ladyGaga);
+        Artist kendrickLamar = new Artist("Kendrick Lamar", "kendrick.lamar@example.com");
+        kendrickLamar.setPassword("kendrick123");
+        artistRepo.create(kendrickLamar);
+        Artist postMalone = new Artist("Post Malone", "post.malone@example.com");
+        postMalone.setPassword("post123");
+        artistRepo.create(postMalone);
+        Artist cardiB = new Artist("Cardi B", "cardi.b@example.com");
+        cardiB.setPassword("cardi123");
+        artistRepo.create(cardiB);
+        Artist shawnMendes = new Artist("Shawn Mendes", "shawn.mendes@example.com");
+        shawnMendes.setPassword("shawn123");
+        artistRepo.create(shawnMendes);
+        Artist duaLipa = new Artist("Dua Lipa", "dua.lipa@example.com");
+        duaLipa.setPassword("dua123");
+        artistRepo.create(duaLipa);
+        Artist harryStyles = new Artist("Harry Styles", "harry.styles@example.com");
+        harryStyles.setPassword("harry123");
+        artistRepo.create(harryStyles);
+        Artist eminem = new Artist("Eminem", "eminem@example.com");
+        eminem.setPassword("eminem123");
+        artistRepo.create(eminem);
         artistRepo.getAll().values().forEach(System.out::println);
         return artistRepo;
     }
@@ -815,26 +827,30 @@ public class MusicApp {
     private static IRepository<Listener> createFileBasedListenerRepository() {
         String filePath = "listeners.csv"; // File for storing listener data
         IRepository<Listener> listenerRepo = new FileRepository<>(filePath);
-        listenerRepo.create(new Listener("John", "john.doe@email.com"));
-        listenerRepo.create(new Listener("Jane Smith", "jane.smith@email.com"));
-        listenerRepo.create(new Listener("Chris Johnson", "chris.johnson@email.com"));
-        listenerRepo.create(new Listener("Sarah Williams", "sarah.williams@email.com"));
-        listenerRepo.create(new Listener("David Brown", "david.brown@email.com"));
-        listenerRepo.create(new Listener("Alice Walker", "alice.walker@example.com"));
-        listenerRepo.create(new Listener("Bob Marley", "bob.marley@example.com"));
-        listenerRepo.create(new Listener("Charlie Brown", "charlie.brown@example.com"));
-        listenerRepo.create(new Listener("Daisy Johnson", "daisy.johnson@example.com"));
-        listenerRepo.create(new Listener("Edward Elric", "edward.elric@example.com"));
-        listenerRepo.create(new Listener("Fiona Apple", "fiona.apple@example.com"));
-        listenerRepo.create(new Listener("George Orwell", "george.orwell@example.com"));
-        listenerRepo.create(new Listener("Hannah Montana", "hannah.montana@example.com"));
-        listenerRepo.create(new Listener("Isaac Newton", "isaac.newton@example.com"));
-        listenerRepo.create(new Listener("Jack Sparrow", "jack.sparrow@example.com"));
-        listenerRepo.create(new Listener("Karen Page", "karen.page@example.com"));
-        listenerRepo.create(new Listener("Larry Page", "larry.page@example.com"));
-        listenerRepo.create(new Listener("Monica Geller", "monica.geller@example.com"));
-        listenerRepo.create(new Listener("Nick Fury", "nick.fury@example.com"));
-        listenerRepo.create(new Listener("Olivia Pope", "olivia.pope@example.com"));
+        Listener john = new Listener("John", "john.doe@email.com");
+        john.setPassword("john123");
+        listenerRepo.create(john);
+        Listener jane = new Listener("Jane Smith", "jane.smith@email.com");
+        jane.setPassword("jane123");
+        listenerRepo.create(jane);
+        Listener chris = new Listener("Chris Johnson", "chris.johnson@email.com");
+        chris.setPassword("chris123");
+        listenerRepo.create(chris);
+        Listener sarah = new Listener("Sarah Williams", "sarah.williams@email.com");
+        sarah.setPassword("sarah123");
+        listenerRepo.create(sarah);
+        Listener david = new Listener("David Brown", "david.brown@email.com");
+        david.setPassword("david123");
+        listenerRepo.create(david);
+        Listener alice = new Listener("Alice Walker", "alice.walker@example.com");
+        alice.setPassword("alice123");
+        listenerRepo.create(alice);
+        Listener bob = new Listener("Bob Marley", "bob.marley@example.com");
+        bob.setPassword("bob123");
+        listenerRepo.create(bob);
+        Listener charlie = new Listener("Charlie Brown", "charlie.brown@example.com");
+        charlie.setPassword("charlie123");
+        listenerRepo.create(charlie);
         listenerRepo.getAll().values().forEach(System.out::println);
         return listenerRepo;
     }
@@ -877,18 +893,6 @@ public class MusicApp {
         Subscription sub6 = new Subscription("Basic", 9.99f, listenerRepo.get(1));  // Alice Walker
         Subscription sub7 = new Subscription("Premium", 14.99f, listenerRepo.get(2)); // Bob Marley
         Subscription sub8 = new Subscription("Basic", 9.99f, listenerRepo.get(3));  // Charlie Brown
-        Subscription sub9 = new Subscription("Premium", 14.99f, listenerRepo.get(4)); // Daisy Johnson
-        Subscription sub10 = new Subscription("Basic", 9.99f, listenerRepo.get(5));    // Edward Elric
-        Subscription sub11 = new Subscription("Premium", 14.99f, listenerRepo.get(6)); // Fiona Apple
-        Subscription sub12 = new Subscription("Basic", 9.99f, listenerRepo.get(7));    // George Orwell
-        Subscription sub13 = new Subscription("Premium", 14.99f, listenerRepo.get(8)); // Hannah Montana
-        Subscription sub14 = new Subscription("Basic", 9.99f, listenerRepo.get(9));    // Isaac Newton
-        Subscription sub15 = new Subscription("Premium", 14.99f, listenerRepo.get(10)); // Jack Sparrow
-        Subscription sub16 = new Subscription("Basic", 9.99f, listenerRepo.get(11));   // Karen Page
-        Subscription sub17 = new Subscription("Premium", 14.99f, listenerRepo.get(12)); // Larry Page
-        Subscription sub18 = new Subscription("Basic", 9.99f, listenerRepo.get(13));   // Monica Geller
-        Subscription sub19 = new Subscription("Premium", 14.99f, listenerRepo.get(14)); // Nick Fury
-        Subscription sub20 = new Subscription("Basic", 9.99f, listenerRepo.get(15));  // Olivia Pope
         Listener john = listenerRepo.get(1);
         Listener jane = listenerRepo.get(2);
         Listener chris = listenerRepo.get(3);
@@ -897,18 +901,6 @@ public class MusicApp {
         Listener alice = listenerRepo.get(6);
         Listener bob = listenerRepo.get(7);
         Listener charlie = listenerRepo.get(8);
-        Listener daisy = listenerRepo.get(9);
-        Listener edward = listenerRepo.get(10);
-        Listener fiona = listenerRepo.get(11);
-        Listener george = listenerRepo.get(12);
-        Listener hannah = listenerRepo.get(13);
-        Listener isaac = listenerRepo.get(14);
-        Listener jack = listenerRepo.get(15);
-        Listener karen = listenerRepo.get(16);
-        Listener larry = listenerRepo.get(17);
-        Listener monica = listenerRepo.get(18);
-        Listener nick = listenerRepo.get(19);
-        Listener olivia = listenerRepo.get(20);
         if (john != null) {
             john.setSubscription(sub1);
         }
@@ -933,42 +925,6 @@ public class MusicApp {
         if (charlie != null) {
             charlie.setSubscription(sub8);
         }
-        if (daisy != null) {
-            daisy.setSubscription(sub9);
-        }
-        if (edward != null) {
-            edward.setSubscription(sub10);
-        }
-        if (fiona != null) {
-            fiona.setSubscription(sub11);
-        }
-        if (george != null) {
-            george.setSubscription(sub12);
-        }
-        if (hannah != null) {
-            hannah.setSubscription(sub13);
-        }
-        if (isaac != null) {
-            isaac.setSubscription(sub14);
-        }
-        if (jack != null) {
-            jack.setSubscription(sub15);
-        }
-        if (karen != null) {
-            karen.setSubscription(sub16);
-        }
-        if (larry != null) {
-            larry.setSubscription(sub17);
-        }
-        if (monica != null) {
-            monica.setSubscription(sub18);
-        }
-        if (nick != null) {
-            nick.setSubscription(sub19);
-        }
-        if (olivia != null) {
-            olivia.setSubscription(sub20);
-        }
         subscriptionRepo.create(sub1);
         subscriptionRepo.create(sub2);
         subscriptionRepo.create(sub3);
@@ -977,18 +933,6 @@ public class MusicApp {
         subscriptionRepo.create(sub6);
         subscriptionRepo.create(sub7);
         subscriptionRepo.create(sub8);
-        subscriptionRepo.create(sub9);
-        subscriptionRepo.create(sub10);
-        subscriptionRepo.create(sub11);
-        subscriptionRepo.create(sub12);
-        subscriptionRepo.create(sub13);
-        subscriptionRepo.create(sub14);
-        subscriptionRepo.create(sub15);
-        subscriptionRepo.create(sub16);
-        subscriptionRepo.create(sub17);
-        subscriptionRepo.create(sub18);
-        subscriptionRepo.create(sub19);
-        subscriptionRepo.create(sub20);
         subscriptionRepo.getAll().values().forEach(System.out::println);
         return subscriptionRepo;
     }
