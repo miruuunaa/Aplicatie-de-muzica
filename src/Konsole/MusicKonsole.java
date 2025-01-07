@@ -1145,23 +1145,12 @@ public class MusicKonsole {
                 if (artist == null) {
                     throw new EntityNotFoundException("Artist not found.");
                 }
-
-                System.out.println("Available genres:");
-                List<Genre> genres = musicController.getAllGenres();
-                for (int i = 0; i < genres.size(); i++) {
-                    System.out.println((i + 1) + ". " + genres.get(i).getName());
-                }
-                System.out.println("Select a genre by number:");
-                int genreChoice = scanner.nextInt();
-                scanner.nextLine();  // Consume newline
-
-                if (genreChoice <= 0 || genreChoice > genres.size()) {
-                    throw new ValidationException("Invalid genre selection.");
-                }
-
-                Genre selectedGenre = genres.get(genreChoice - 1);
+                System.out.println("Enter genre name:");
+                String genreName = scanner.nextLine();
+                musicController.addGenreToSystem(genreName);
+                Genre genre = new Genre(genreName);
                 Album album = new Album(albumTitle, releaseDate, artist);
-                album.setGenre(selectedGenre);
+                album.setGenre(genre);
                 musicController.addAlbum(album);
                 System.out.println("Album '" + albumTitle + "' added to artist " + artist.getName());
 

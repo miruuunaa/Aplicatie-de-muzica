@@ -910,4 +910,9 @@ public class MusicController {
     public List<Genre> getAllGenres() {
         return genreService.getAllGenres();
     }
+
+    public void addGenreToSystem(String genreName) {
+        Genre genre = new Genre(genreName);
+        genreService.addGenre(genre);
+    }
 }
