@@ -1,16 +1,12 @@
 # Musik Anwendung/Music Aplication
 
-Die Anwendung namens "MTIFY Music" bietet die Möglichkeit um die beliebtesten Musikgenres aud persönlichen Tops anzuhören mit ein höhsten Qualität.
+Die Anwendung namens "MTIFY Music" bietet die Möglichkeit um die beliebtesten Musikgenres aus persönlichen Tops anzuhören mit ein höhsten Qualität.
 Bietet die Posibilität an Live-Konzerten teilzunehmen.
-Die Vorteile eines Premium-Kontos sind:(trebuie refacut)
--die Kommentare in einer Live-Konzert sind mehr zugänglich für die Artisten;
--exklusiver Zugriff auf die neuen Musikalben/Musikstücke;
--Offline-Abhören;
--Live-Verse-Funktion.
+Bei der Anwendung dieses Apps , der User kann sich ein Artist- oder ListenerKonto erstellen un jeweils in dem Konto anzumelden. Der Konto besteht aus einer username, email und password. 
 
 Liste der Funktionalitäten:
 1. sortSongsByTitle(int albumId)
-        Sortiert alle Songs eines bestimmten Albums nach ihrem Titel alphabetisch.
+        Sortiert alle Lieder eines bestimmten Albums nach ihrem Titel alphabetisch.
         Parameter: albumId – die ID des Albums.
         Rückgabewert: Eine sortierte Liste von Songs.
         Fehler: Löst eine Ausnahme aus, wenn das Album nicht gefunden wird.
@@ -23,7 +19,7 @@ Liste der Funktionalitäten:
 3. filterSongsByMinimumDuration(int artistId, float minDuration)
         Filtert Songs eines Künstlers basierend auf einer minimalen Dauer.
         Parameter: artistId – die ID des Künstlers, minDuration – die Mindestlänge eines Songs in Minuten.
-        Rückgabewert: Eine Liste von Songs, die die Daueranforderung erfüllen. Gibt eine leere Liste zurück, wenn der Künstler nicht gefunden wird.
+        Rückgabewert: Eine Liste von Songs, die die Daueranforderung erfüllt. Gibt eine leere Liste zurück, wenn der Künstler nicht gefunden wird.
    
 4. sortAlbumsByReleaseDate(int artistId)
         Sortiert die Alben eines Künstlers nach dem Veröffentlichungsdatum.
@@ -32,7 +28,7 @@ Liste der Funktionalitäten:
         Fehler: Löst eine Ausnahme aus, wenn der Künstler nicht gefunden wird.
    
 5. getArtistsWithMostSongsAndAlbums()
-        Berechnet die Gesamtanzahl von Songs und Alben für jeden Künstler und sortiert die Künstler basierend auf der Gesamtzahl.
+        Berechnet die Gesamtanzahl von Lieder und Alben für jeden Künstler und sortiert die Künstler basierend auf der Gesamtzahl.
         Rückgabewert: Eine Liste von Künstlern, sortiert nach der Gesamtzahl von Songs und Alben.
    
 6. calculateConcertVIPScore(Listener listener, int concertId)
@@ -42,7 +38,7 @@ Liste der Funktionalitäten:
         Fehler: Löst eine Ausnahme aus, wenn das Konzert nicht gefunden wird.
    
 7. recommend_songs(History userHistory)
-        Empfiehlt dem Benutzer Songs basierend auf seiner Hörhistorie und seinen Lieblingskünstlern.
+        Empfiehlt dem Benutzer Lieder basierend auf seiner Hörhistorie und seinen Lieblingskünstlern.
         Parameter: userHistory – die Hörhistorie des Benutzers.
         Rückgabewert: Eine Liste von Songs, die dem Geschmack des Benutzers entsprechen, aber nicht in seiner Historie enthalten sind.
    
@@ -166,11 +162,7 @@ Fehlerbehandlung: Wirft eine RuntimeException, wenn ein SQL-Fehler auftritt.
 
 The application called “MTIFY Music” offers the possibility to listen to the most popular music genres at the highest quality.
 Offers the possibility to participate in live concerts.
-The advantages of a premium account are: (trebuie refacut)
--The comments in a live concert are more accessible to the artists;
--exclusive access to new music albums/tracks;
--offline listening;
--Live verse function.
+When using this app, the user can create an artist or listener account and log into the account. The account consists of a username, email and password.
 
 List of functionalities:
 1. sortSongsByTitle(int albumId)
